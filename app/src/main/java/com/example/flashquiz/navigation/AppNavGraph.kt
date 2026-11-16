@@ -25,6 +25,7 @@ fun AppNavGraph(
     viewModel: FlashQuizViewModel = viewModel()
 ) {
     val decks by viewModel.decks.collectAsState()
+    val quizState by viewModel.quizState.collectAsState()
 
     NavHost(
         navController = navController,
@@ -54,6 +55,53 @@ fun AppNavGraph(
             val deck = decks.find { it.id == deckId }
 
             Placeholder("Deck: ${deck?.name} (${deck?.cards?.size} cards)") {
+                Button(onClick = {
+                    navController.navigate(Screen.AddCard.createRoute(deckId))
+                }) { Text("Add card") }
+
+                Button(
+                    enabled = deck?.cards?.isNotEmpty() == true,
+                    onClick = {
+                        viewModel.startQuiz(deckId)
+                        navController.navigate(Screen.Quiz.createRoute(deckId))
+                    }
+                ) { Text("Start quiz") }
+
+                Button(onClick = { navController.popBackStack() }) { Text("Back") }
+            }
+        }
+
+        composable(
+            route = Screen.AddCard.route,
+            arguments = listOf(navArgument("deckId") { type = NavType.IntType })
+        ) { entry ->
+            val deckId = entry.arguments?.getInt("deckId") ?: -1
+
+            Placeholder("Add card to deck $deckId") {
+                Button(onClick = {
+                    viewModel.addCard(deckId, "Test question", "test")
+                    navController.popBackStack()
+                }) { Text("Save test card") }
+
+                Button(onClick = { navController.popBackStack() }) { Text("Back") }
+            }
+        }
+
+        composable(
+            route = Screen.Quiz.route,
+            arguments = listOf(navArgument("deckId") { type = NavType.IntType })
+        ) {
+
+            Placeholder("Q ${quizState.currentIndex + 1}/${quizState.total}: ${quizState.currentCard?.question}") {
+                Text("Score: ${quizState.score}")
+                Text("Last answer correct: ${quizState.lastAnswerCorrect}")
+
+                Button(onClick = {
+                    viewModel.submitAnswer(quizState.currentCard?.answer ?: "")
+                }) { Text("Answer correctly (test)") }
+
+                Button(onClick = { viewModel.nextQuestion() }) { Text("Next") }
+
                 Button(onClick = { navController.popBackStack() }) { Text("Back") }
             }
         }
