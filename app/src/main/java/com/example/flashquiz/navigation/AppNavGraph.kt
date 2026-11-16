@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -90,7 +91,18 @@ fun AppNavGraph(
         composable(
             route = Screen.Quiz.route,
             arguments = listOf(navArgument("deckId") { type = NavType.IntType })
-        ) {
+        ) { entry ->
+            val deckId = entry.arguments?.getInt("deckId") ?: -1
+
+            LaunchedEffect(quizState.isFinished) {
+                if (quizState.isFinished) {
+                    navController.navigate(
+                        Screen.Result.createRoute(quizState.score, quizState.total, deckId)
+                    ) {
+                        popUpTo(Screen.Quiz.route) { inclusive = true }
+                    }
+                }
+            }
 
             Placeholder("Q ${quizState.currentIndex + 1}/${quizState.total}: ${quizState.currentCard?.question}") {
                 Text("Score: ${quizState.score}")
@@ -103,6 +115,32 @@ fun AppNavGraph(
                 Button(onClick = { viewModel.nextQuestion() }) { Text("Next") }
 
                 Button(onClick = { navController.popBackStack() }) { Text("Back") }
+            }
+        }
+
+        composable(
+            route = Screen.Result.route,
+            arguments = listOf(
+                navArgument("score") { type = NavType.IntType },
+                navArgument("total") { type = NavType.IntType },
+                navArgument("deckId") { type = NavType.IntType }
+            )
+        ) { entry ->
+            val score = entry.arguments?.getInt("score") ?: 0
+            val total = entry.arguments?.getInt("total") ?: 0
+            val deckId = entry.arguments?.getInt("deckId") ?: -1
+
+            Placeholder("Result: $score / $total") {
+                Button(onClick = {
+                    viewModel.startQuiz(deckId)
+                    navController.navigate(Screen.Quiz.createRoute(deckId)) {
+                        popUpTo(Screen.Result.route) { inclusive = true }
+                    }
+                }) { Text("Try again") }
+
+                Button(onClick = {
+                    navController.popBackStack(Screen.DeckList.route, inclusive = false)
+                }) { Text("Back to decks") }
             }
         }
     }
