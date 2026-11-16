@@ -39,6 +39,48 @@ class FlashQuizViewModel : ViewModel() {
     }
 
 
+    fun startQuiz(deckId: Int) {
+        val cards = getDeck(deckId)?.cards.orEmpty().shuffled()
+        _quizState.value = QuizUiState(deckId = deckId, cards = cards)
+    }
+
+
+
+
+    fun submitAnswer(answer: String) {
+
+
+        _quizState.update { state ->
+            val card = state.currentCard
+            if (card == null || state.isFinished || state.lastAnswerCorrect != null) {
+                state
+            } else {
+
+
+                val correct = answer.trim().equals(card.answer, ignoreCase = true)
+                state.copy(
+
+                    score = if (correct) state.score + 1 else state.score,
+                    lastAnswerCorrect = correct)
+
+            }
+        } }
+
+
+
+    fun nextQuestion() {
+        _quizState.update { state ->
+            val next = state.currentIndex + 1
+            if (next >= state.cards.size) {
+
+
+                state.copy(isFinished = true)
+            } else {
+                state.copy(currentIndex = next, lastAnswerCorrect = null)
+            }
+        }
+    }
+
     private fun sampleDecks() = listOf(
 
         Deck(
