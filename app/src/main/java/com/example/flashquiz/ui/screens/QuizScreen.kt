@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,13 +20,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.flashquiz.data.model.Flashcard
 import com.example.flashquiz.data.model.QuizUiState
+import com.example.flashquiz.ui.theme.Correct
 import com.example.flashquiz.ui.theme.FlashQuizTheme
 
 @Composable
 fun QuizScreen(
-    state:QuizUiState,
-    onSubmit:(String) -> Unit,
-    modifier:Modifier = Modifier
+    state: QuizUiState,
+    onSubmit: (String) -> Unit,
+    onNext: () -> Unit,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     var answer by rememberSaveable(state.currentIndex) { mutableStateOf("") }
 
@@ -53,6 +57,16 @@ fun QuizScreen(
             enabled = answer.isNotBlank() && state.lastAnswerCorrect == null,
             modifier = Modifier.fillMaxWidth()
         ) { Text("Check") }
+        state.lastAnswerCorrect?.let { correct ->
+            Text(
+                text = if (correct) "Correct!" else "Wrong. Answer: ${state.currentCard?.answer}",
+                color = if (correct) Correct else MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Button(onClick = onNext, modifier = Modifier.fillMaxWidth()) { Text("Next") }
+        }
+
+        OutlinedButton(onClick = onBack, modifier = Modifier.fillMaxWidth()) { Text("Back") }
     }
 }
 
@@ -67,7 +81,9 @@ fun QuizScreenPreview() {
                     Flashcard(2, "Keyword for a mutable variable?", "var")
                 )
             ),
-            onSubmit = {}
+            onSubmit = {},
+            onNext = {},
+            onBack = {}
         )
     }
 }
