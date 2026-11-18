@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,6 +21,8 @@ import androidx.compose.ui.unit.dp
 import com.example.flashquiz.ui.theme.FlashQuizTheme
 @Composable
 fun AddCardScreen(
+    onSave: (String, String) -> Unit,
+    onBack: () -> Unit,
     modifier: Modifier= Modifier
 ){
     var question by rememberSaveable{mutableStateOf("")}
@@ -42,10 +46,19 @@ fun AddCardScreen(
             label={Text("Answer")},
             modifier= Modifier.fillMaxSize()
         )
+        Button(
+            onClick = { onSave(question, answer) },
+            enabled = question.isNotBlank() && answer.isNotBlank(),
+            modifier = Modifier.fillMaxWidth()
+        ) { Text("Save") }
+
+        OutlinedButton(onClick = onBack, modifier = Modifier.fillMaxWidth()) {
+            Text("Back")
+        }
     }
 }
 @Preview(showBackground = true)
 @Composable
 fun AddCardScreenPreview() {
-    FlashQuizTheme { AddCardScreen() }
+    FlashQuizTheme { AddCardScreen(onSave = { _, _ -> }, onBack = {}) }
 }
