@@ -3,8 +3,11 @@ package com.example.flashquiz.ui.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -14,7 +17,13 @@ import androidx.compose.ui.unit.dp
 import com.example.flashquiz.ui.theme.FlashQuizTheme
 
 @Composable
-fun ResultScreen(score: Int, total: Int, modifier: Modifier = Modifier) {
+fun ResultScreen(
+    score: Int,
+    total: Int,
+    onTryAgain: () -> Unit,
+    onBackToDecks: () -> Unit,
+    modifier: Modifier = Modifier
+){
     Column(
         modifier = modifier.fillMaxSize().padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
@@ -26,11 +35,21 @@ fun ResultScreen(score: Int, total: Int, modifier: Modifier = Modifier) {
             style = MaterialTheme.typography.displayMedium,
             color = MaterialTheme.colorScheme.primary
         )
+        Text(
+            if (total > 0 && score * 2 >= total) "Great job!" else "Keep practicing",
+            style = MaterialTheme.typography.titleMedium
+        )
+        Button(onClick = onTryAgain, modifier = Modifier.fillMaxWidth()) {
+            Text("Try again")
+        }
+        OutlinedButton(onClick = onBackToDecks, modifier = Modifier.fillMaxWidth()) {
+            Text("Back to decks")
+        }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun ResultScreenPreview() {
-    FlashQuizTheme { ResultScreen(score = 2, total = 3) }
+    FlashQuizTheme { ResultScreen(score = 2, total = 3, onTryAgain = {}, onBackToDecks = {})}
 }
