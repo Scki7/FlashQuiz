@@ -1,8 +1,11 @@
 package com.example.flashquiz.ui.screens
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,6 +24,15 @@ fun DeckDetailScreen(deck: Deck?, modifier: Modifier = Modifier) {
         Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
             Text(deck.name, style = MaterialTheme.typography.headlineMedium)
             Text("${deck.cards.size} cards", style = MaterialTheme.typography.bodyMedium)
+
+            LazyColumn(
+                modifier = Modifier.weight(1f).padding(vertical = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(deck.cards, key = { it.id }) { card ->
+                    Text(card.question,style = MaterialTheme.typography.bodyLarge)
+                }
+            }
         }
     }
 }
@@ -30,7 +42,27 @@ fun DeckDetailScreen(deck: Deck?, modifier: Modifier = Modifier) {
 fun DeckDetailScreenPreview() {
     FlashQuizTheme {
         DeckDetailScreen(
-            deck = Deck(1, "Kotlin basics", listOf(Flashcard(1, "Q?", "A")))
+            deck = Deck(
+                1,
+                "Kotlin basics",
+                listOf(
+                    Flashcard(1, "Q1?", "A"),
+                    Flashcard(2,"Q2?","A"),
+                    Flashcard(3,"Q2?","A"),
+                    Flashcard(4,"Q2?","A"),
+                    Flashcard(5,"Q2?","A"),
+                    Flashcard(6,"Q2?","A"),
+                    Flashcard(7,"Q2?","A"),
+                    Flashcard(8,"Q2?","A"),
+                    Flashcard(9,"Q2?","A"),
+                    Flashcard(10,"Q2?","A"),
+                    Flashcard(11,"Q2?","A"),
+                    Flashcard(12,"Q2?","A"),
+                    Flashcard(13,"Q2?","A"),
+
+                )
+
+            )
 
         )
     }
