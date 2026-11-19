@@ -6,7 +6,7 @@ adds cards to them and takes a quiz. The app counts the score and shows the resu
 
 ## Group members
 - Yerassyl Taubayev: project setup, data models, ViewModel, state, navigation
-- Имя Фамилия напарника: UI screens, reusable composables, theme
+- Aibergen Tolepbergen: UI screens, reusable composables, theme
 
 ## Main features
 - Create decks of flashcards
