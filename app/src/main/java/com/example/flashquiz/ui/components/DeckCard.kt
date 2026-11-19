@@ -41,7 +41,7 @@ fun DeckCard(
                 style = MaterialTheme.typography.titleMedium
             )
             Text(
-                text = "$cardCount cards",
+                text = if(cardCount==1)"1 card" else "$cardCount cards",
                 style = MaterialTheme.typography.bodySmall,
             )
         }
