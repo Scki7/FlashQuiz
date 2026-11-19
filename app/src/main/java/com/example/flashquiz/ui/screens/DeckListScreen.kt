@@ -7,9 +7,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -22,9 +29,12 @@ import com.example.flashquiz.ui.theme.FlashQuizTheme
 fun DeckListScreen(
     decks: List<Deck>,
     onDeckClick: (Int) -> Unit,
-    onAddDeck: () -> Unit,
+    onAddDeck: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var showDialog by rememberSaveable { mutableStateOf(false) }
+    var newName by rememberSaveable { mutableStateOf("") }
+
     Column(modifier = modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier.weight(1f),
@@ -42,7 +52,7 @@ fun DeckListScreen(
             }
         }
         Button(
-            onClick = onAddDeck,
+            onClick = { showDialog = true },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
@@ -50,6 +60,34 @@ fun DeckListScreen(
             Text("Add deck")
         }
     }
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("New deck") },
+            text = {
+                OutlinedTextField(
+                    value = newName,
+                    onValueChange = { newName = it },
+                    label = { Text("Deck name") },
+                    singleLine = true
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onAddDeck(newName)
+                        newName = ""
+                        showDialog = false
+                    },
+                    enabled = newName.isNotBlank()
+                ) { Text("Create") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog = false }) { Text("Cancel") }
+            }
+        )
+    }
+
 }
 
 @Preview(showBackground = true)

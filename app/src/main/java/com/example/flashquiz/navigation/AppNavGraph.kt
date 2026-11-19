@@ -37,8 +37,7 @@ fun AppNavGraph(
                 onDeckClick = { id ->
                     navController.navigate(Screen.DeckDetail.createRoute(id))
                 },
-                onAddDeck = { viewModel.addDeck("New deck ${decks.size + 1}") }
-            )
+                onAddDeck = { name -> viewModel.addDeck(name) }            )
         }
 
         composable(
