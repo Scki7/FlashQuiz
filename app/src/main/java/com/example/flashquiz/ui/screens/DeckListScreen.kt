@@ -1,9 +1,14 @@
 package com.example.flashquiz.ui.screens
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -17,23 +22,32 @@ import com.example.flashquiz.ui.theme.FlashQuizTheme
 fun DeckListScreen(
     decks: List<Deck>,
     onDeckClick: (Int) -> Unit,
+    onAddDeck: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        // DeckCard-та padding(horizontal = 16.dp, vertical = 6.dp) бар болғандықтан,
-        // мұнда тек үсті мен астына ғана сәл бос орын береміз (екі еселенбеуі үшін)
-        contentPadding = PaddingValues(top = 8.dp, bottom = 80.dp)
-    ) {
-        items(
-            items = decks,
-            key = { deck -> deck.id }
-        ) { deck ->
-            DeckCard(
-                name = deck.name,
-                cardCount = deck.cards.size,
-                onClick = { onDeckClick(deck.id) }
-            )
+    Column(modifier = modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier.weight(1f),
+            contentPadding = PaddingValues(vertical = 8.dp)
+        ) {
+            items(
+                items = decks,
+                key = { deck -> deck.id }
+            ) { deck ->
+                DeckCard(
+                    name = deck.name,
+                    cardCount = deck.cards.size,
+                    onClick = { onDeckClick(deck.id) }
+                )
+            }
+        }
+        Button(
+            onClick = onAddDeck,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text("Add deck")
         }
     }
 }
@@ -46,15 +60,15 @@ fun DeckListScreenPreview() {
             id = 1,
             name = "Kotlin Basics",
             cards = listOf(
-                Flashcard(id = 1, question = "Read-only айнымалы?", answer = "val"),
-                Flashcard(id = 2, question = "Өзгеретін айнымалы?", answer = "var")
+                Flashcard(id = 1, question = "Read-only variable?", answer = "val"),
+                Flashcard(id = 2, question = "Mutable variable?", answer = "var")
             )
         ),
         Deck(
             id = 2,
             name = "Jetpack Compose",
             cards = listOf(
-                Flashcard(id = 3, question = "Тізім шығаратын компонент?", answer = "LazyColumn")
+                Flashcard(id = 3, question = "List component?", answer = "LazyColumn")
             )
         ),
         Deck(
@@ -67,7 +81,8 @@ fun DeckListScreenPreview() {
     FlashQuizTheme {
         DeckListScreen(
             decks = sampleDecks,
-            onDeckClick = {}
+            onDeckClick = {},
+            onAddDeck = {}
         )
     }
 }
