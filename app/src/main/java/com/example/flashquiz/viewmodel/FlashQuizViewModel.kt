@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import com.example.flashquiz.data.model.StudyUiState
 
 class FlashQuizViewModel : ViewModel() {
 
@@ -16,6 +17,9 @@ class FlashQuizViewModel : ViewModel() {
     val decks: StateFlow<List<Deck>> = _decks.asStateFlow()
     private val _quizState = MutableStateFlow(QuizUiState())
     val quizState: StateFlow<QuizUiState> = _quizState.asStateFlow()
+
+    private val _studyState = MutableStateFlow(StudyUiState())
+    val studyState: StateFlow<StudyUiState> = _studyState.asStateFlow()
 
 
 
@@ -78,6 +82,54 @@ class FlashQuizViewModel : ViewModel() {
             } else {
                 state.copy(currentIndex = next, lastAnswerCorrect = null)
             }
+        }
+    }
+
+    fun startStudy(deckId: Int) {
+        val cards = getDeck(deckId)?.cards.orEmpty()
+        _studyState.value = StudyUiState(deckId = deckId, cards = cards)
+    }
+
+    fun flipCard() {
+        _studyState.update { state -> state.copy(isFlipped = !state.isFlipped) }
+    }
+
+    fun nextCard() {
+        _studyState.update { state ->
+            if (state.isLast) {
+                state
+            } else {
+                state.copy(currentIndex = state.currentIndex + 1, isFlipped = false)
+            }
+        }
+    }
+
+    fun previousCard() {
+        _studyState.update { state ->
+            if (state.isFirst) {
+                state
+            } else {
+                state.copy(currentIndex = state.currentIndex - 1, isFlipped = false)
+            }
+        }
+    }
+
+    fun toggleKnown() {
+        _studyState.update { state ->
+            val card = state.currentCard
+            if (card == null) {
+                state
+            } else if (card.id in state.knownIds) {
+                state.copy(knownIds = state.knownIds - card.id)
+            } else {
+                state.copy(knownIds = state.knownIds + card.id)
+            }
+        }
+    }
+
+    fun shuffleStudy() {
+        _studyState.update { state ->
+            state.copy(cards = state.cards.shuffled(), currentIndex = 0, isFlipped = false)
         }
     }
 
