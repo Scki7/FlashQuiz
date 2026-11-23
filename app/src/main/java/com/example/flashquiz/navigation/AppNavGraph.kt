@@ -1,4 +1,5 @@
 package com.example.flashquiz.navigation
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,6 +28,7 @@ fun AppNavGraph(
 ) {
     val decks by viewModel.decks.collectAsState()
     val quizState by viewModel.quizState.collectAsState()
+    val studyState by viewModel.studyState.collectAsState()
 
     NavHost(
         navController = navController,
@@ -59,6 +61,14 @@ fun AppNavGraph(
                 Button(onClick = {
                     navController.navigate(Screen.AddCard.createRoute(deckId))
                 }) { Text("Add card") }
+
+                Button(
+                    enabled = deck?.cards?.isNotEmpty() == true,
+                    onClick = {
+                        viewModel.startStudy(deckId)
+                        navController.navigate(Screen.Study.createRoute(deckId))
+                    }
+                ) { Text("Study") }
 
                 Button(
                     enabled = deck?.cards?.isNotEmpty() == true,
@@ -141,6 +151,32 @@ fun AppNavGraph(
                 Button(onClick = {
                     navController.popBackStack(Screen.DeckList.route, inclusive = false)
                 }) { Text("Back to decks") }
+            }
+        }
+
+        composable(
+            route = Screen.Study.route,
+            arguments = listOf(navArgument("deckId") { type = NavType.IntType })
+        ) {
+
+            Placeholder("Card ${studyState.currentIndex + 1}/${studyState.total}") {
+                Text(
+                    if (studyState.isFlipped) "A: ${studyState.currentCard?.answer}"
+                    else "Q: ${studyState.currentCard?.question}"
+                )
+                Text("Known: ${studyState.knownCount}")
+
+                Button(onClick = { viewModel.flipCard() }) { Text("Flip") }
+
+                Button(onClick = { viewModel.toggleKnown() }) {
+                    Text(if (studyState.isCurrentKnown) "Unmark known" else "Mark known")
+                }
+
+                Button(onClick = { viewModel.previousCard() }) { Text("Previous") }
+
+                Button(onClick = { viewModel.nextCard() }) { Text("Next") }
+
+                Button(onClick = { navController.popBackStack() }) { Text("Back") }
             }
         }
     }
