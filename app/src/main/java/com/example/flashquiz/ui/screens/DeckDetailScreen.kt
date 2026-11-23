@@ -10,8 +10,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -22,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.example.flashquiz.data.model.Deck
 import com.example.flashquiz.data.model.Flashcard
 import com.example.flashquiz.ui.theme.FlashQuizTheme
+
 @Composable
 fun DeckDetailScreen(
     deck: Deck?,
@@ -29,7 +34,7 @@ fun DeckDetailScreen(
     onStartQuiz: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
-){
+) {
     if (deck == null) {
         Text("Deck not found", modifier = modifier.padding(24.dp))
     } else {
@@ -37,12 +42,25 @@ fun DeckDetailScreen(
             modifier = modifier
                 .fillMaxSize()
                 .statusBarsPadding()
-                .padding(16.dp)) {
+                .padding(16.dp)
+        ) {
+            IconButton(
+                onClick = onBack,
+                modifier = Modifier.padding(bottom = 8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back"
+                )
+            }
+
             Text(deck.name, style = MaterialTheme.typography.headlineMedium)
             Text("${deck.cards.size} cards", style = MaterialTheme.typography.bodyMedium)
 
             LazyColumn(
-                modifier = Modifier.weight(1f).padding(vertical = 12.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(deck.cards, key = { it.id }) { card ->
@@ -56,7 +74,10 @@ fun DeckDetailScreen(
                 }
             }
             Row(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 OutlinedButton(onClick = onAddCard, modifier = Modifier.weight(1f)) {
@@ -68,8 +89,6 @@ fun DeckDetailScreen(
                     modifier = Modifier.weight(1f)
                 ) { Text("Start quiz") }
             }
-            Button(onClick = onBack,modifier = Modifier.navigationBarsPadding()) { Text("Back") }
-
         }
     }
 }
@@ -84,25 +103,23 @@ fun DeckDetailScreenPreview() {
                 "Kotlin basics",
                 listOf(
                     Flashcard(1, "Q1?", "A"),
-                    Flashcard(2,"Q2?","A"),
-                    Flashcard(3,"Q2?","A"),
-                    Flashcard(4,"Q2?","A"),
-                    Flashcard(5,"Q2?","A"),
-                    Flashcard(6,"Q2?","A"),
-                    Flashcard(7,"Q2?","A"),
-                    Flashcard(8,"Q2?","A"),
-                    Flashcard(9,"Q2?","A"),
-                    Flashcard(10,"Q2?","A"),
-                    Flashcard(11,"Q2?","A"),
-                    Flashcard(12,"Q2?","A"),
-                    Flashcard(13,"Q2?","A"),
-
+                    Flashcard(2, "Q2?", "A"),
+                    Flashcard(3, "Q2?", "A"),
+                    Flashcard(4, "Q2?", "A"),
+                    Flashcard(5, "Q2?", "A"),
+                    Flashcard(6, "Q2?", "A"),
+                    Flashcard(7, "Q2?", "A"),
+                    Flashcard(8, "Q2?", "A"),
+                    Flashcard(9, "Q2?", "A"),
+                    Flashcard(10, "Q2?", "A"),
+                    Flashcard(11, "Q2?", "A"),
+                    Flashcard(12, "Q2?", "A"),
+                    Flashcard(13, "Q2?", "A"),
                 )
             ),
             onBack = {},
             onAddCard = {},
             onStartQuiz = {}
-
         )
     }
 }
