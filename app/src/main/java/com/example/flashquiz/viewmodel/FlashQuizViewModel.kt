@@ -90,6 +90,15 @@ class FlashQuizViewModel : ViewModel() {
         _flashcardState.value = FlashcardUiState(deckId = deckId, cards = cards)
     }
 
+    fun startLearn(deckId: Int) {
+        val cards = getDeck(deckId)?.cards.orEmpty().shuffled()
+
+        _learnState.value = LearnUiState(
+            deckId = deckId,
+            cards = cards
+        )
+    }
+
     fun flipCard() {
         _flashcardState.update { state -> state.copy(isFlipped = !state.isFlipped) }
     }
