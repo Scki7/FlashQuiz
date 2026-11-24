@@ -28,6 +28,7 @@ fun DeckDetailScreen(
     deck: Deck?,
     onAddCard: () -> Unit,
     onStudy: () -> Unit,
+    onStartLearn: () -> Unit,
     onStartQuiz: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
@@ -181,6 +182,18 @@ fun DeckDetailScreen(
             )
 
             // Learn mode will be added here later.
+            StudyModeButton(
+                title = "Learn",
+                description = "Practice with multiple-choice questions",
+                icon = {
+                    Icon(
+                        Icons.Default.School,
+                        contentDescription = null
+                    )
+                },
+                onClick = onStartLearn,
+                enabled = deck.cards.isNotEmpty()
+            )
 
             StudyModeButton(
                 title = "Test",
@@ -255,6 +268,7 @@ fun DeckDetailScreenPreview() {
             ),
             onAddCard = {},
             onStudy = {},
+            onStartLearn = {},
             onStartQuiz = {},
             onBack = {}
         )

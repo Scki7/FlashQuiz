@@ -60,6 +60,9 @@ fun AppNavGraph(
                     viewModel.startFlashcards(deckId)
                     navController.navigate(Screen.Flashcards.createRoute(deckId))
                 },
+                onStartLearn = {
+                    navController.navigate(Screen.Learn.createRoute(deckId))
+                },
                 onStartQuiz = {
                     viewModel.startQuiz(deckId)
                     navController.navigate(Screen.Quiz.createRoute(deckId))
