@@ -11,59 +11,52 @@ import com.example.flashquiz.data.model.FlashcardUiState
 import com.example.flashquiz.data.model.LearnUiState
 
 class FlashQuizViewModel : ViewModel() {
-
     private var nextDeckId = 3
     private var nextCardId = 100
     private val _decks = MutableStateFlow(sampleDecks())
     val decks: StateFlow<List<Deck>> = _decks.asStateFlow()
     private val _quizState = MutableStateFlow(QuizUiState())
     val quizState: StateFlow<QuizUiState> = _quizState.asStateFlow()
-
     private val _flashcardState = MutableStateFlow(FlashcardUiState())
     val flashcardState: StateFlow<FlashcardUiState> = _flashcardState.asStateFlow()
-
     private val _learnState = MutableStateFlow(LearnUiState())
     val learnState: StateFlow<LearnUiState> = _learnState.asStateFlow()
-
     fun getDeck(deckId: Int): Deck? = _decks.value.find { it.id == deckId }
     fun addDeck(name: String) {
         if (name.isBlank()) return
-
         _decks.update { it + Deck(id = nextDeckId++, name = name.trim()) }
     }
-
-    fun addCard(deckId: Int, question: String, answer: String) {
+    fun addCard(
+        deckId: Int,
+        question: String,
+        answer: String,
+        wrongAnswers: List<String>
+    ) {
         if (question.isBlank() || answer.isBlank()) return
-        val card = Flashcard(nextCardId++, question.trim(), answer.trim())
+        val card = Flashcard(
+               id = nextCardId++,
+            question = question.trim(),
+            answer = answer.trim(),
+            wrongAnswers = wrongAnswers
+        )
         _decks.update { list ->
             list.map { deck ->
                 if (deck.id == deckId) deck.copy(cards = deck.cards + card) else deck
             }
         }
     }
-
-
     fun startQuiz(deckId: Int) {
         val cards = getDeck(deckId)?.cards.orEmpty().shuffled()
         _quizState.value = QuizUiState(deckId = deckId, cards = cards)
     }
-
-
-
-
     fun submitAnswer(answer: String) {
-
-
         _quizState.update { state ->
             val card = state.currentCard
             if (card == null || state.isFinished || state.lastAnswerCorrect != null) {
                 state
             } else {
-
-
                 val correct = answer.trim().equals(card.answer, ignoreCase = true)
                 state.copy(
-
                     score = if (correct) state.score + 1 else state.score,
                     lastAnswerCorrect = correct)
 
@@ -71,38 +64,30 @@ class FlashQuizViewModel : ViewModel() {
         } }
 
 
-
     fun nextQuestion() {
         _quizState.update { state ->
             val next = state.currentIndex + 1
             if (next >= state.cards.size) {
-
-
                 state.copy(isFinished = true)
             } else {
                 state.copy(currentIndex = next, lastAnswerCorrect = null)
             }
         }
     }
-
     fun startFlashcards(deckId: Int) {
         val cards = getDeck(deckId)?.cards.orEmpty()
         _flashcardState.value = FlashcardUiState(deckId = deckId, cards = cards)
     }
-
     fun startLearn(deckId: Int) {
         val cards = getDeck(deckId)?.cards.orEmpty().shuffled()
-
         _learnState.value = LearnUiState(
             deckId = deckId,
             cards = cards
         )
     }
-
     fun flipCard() {
         _flashcardState.update { state -> state.copy(isFlipped = !state.isFlipped) }
     }
-
     fun nextCard() {
         _flashcardState.update { state ->
             if (state.isLast) {
@@ -112,7 +97,6 @@ class FlashQuizViewModel : ViewModel() {
             }
         }
     }
-
     fun previousCard() {
         _flashcardState.update { state ->
             if (state.isFirst) {
@@ -135,26 +119,20 @@ class FlashQuizViewModel : ViewModel() {
             }
         }
     }
-
     fun shuffleFlashcards() {
         _flashcardState.update { state ->
             state.copy(cards = state.cards.shuffled(), currentIndex = 0, isFlipped = false)
         }
     }
-
     private fun sampleDecks() = listOf(
-
         Deck(
             id = 1, name = "Kotlin basics",
             cards = listOf(
                 Flashcard(1, "Keyword for a read-only variable?", "val"),
                 Flashcard(2, "Keyword for a mutable variable?", "var"),
-
                 Flashcard(3, "Keyword to declare a function?", "fun")
             )
-        )
-        ,
-
+        ),
         Deck(
             id = 2, name = "English words",
             cards = listOf(

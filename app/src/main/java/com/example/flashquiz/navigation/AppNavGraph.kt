@@ -74,8 +74,13 @@ fun AppNavGraph(
             val deckId = entry.arguments?.getInt("deckId") ?: -1
 
             AddCardScreen(
-                onSave = { question, answer ->
-                    viewModel.addCard(deckId, question, answer)
+                onSave = { question, answer, wrongAnswers ->
+                    viewModel.addCard(
+                        deckId = deckId,
+                        question = question,
+                        answer = answer,
+                        wrongAnswers = wrongAnswers
+                    )
                     navController.popBackStack()
                 },
                 onBack = { navController.popBackStack() }
