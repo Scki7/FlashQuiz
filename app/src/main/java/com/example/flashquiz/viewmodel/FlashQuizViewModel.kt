@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import com.example.flashquiz.data.model.FlashcardUiState
+import com.example.flashquiz.data.model.LearnUiState
 
 class FlashQuizViewModel : ViewModel() {
 
@@ -20,6 +21,9 @@ class FlashQuizViewModel : ViewModel() {
 
     private val _flashcardState = MutableStateFlow(FlashcardUiState())
     val flashcardState: StateFlow<FlashcardUiState> = _flashcardState.asStateFlow()
+
+    private val _learnState = MutableStateFlow(LearnUiState())
+    val learnState: StateFlow<LearnUiState> = _learnState.asStateFlow()
 
     fun getDeck(deckId: Int): Deck? = _decks.value.find { it.id == deckId }
     fun addDeck(name: String) {
