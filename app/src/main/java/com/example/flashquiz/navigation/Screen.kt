@@ -14,6 +14,9 @@ sealed class Screen(val route: String) {
     object Flashcards : Screen("flashcards/{deckId}") {
         fun createRoute(deckId: Int) = "flashcards/$deckId"
     }
+    data object Learn : Screen("learn/{deckId}") {
+        fun createRoute(deckId: Int) = "learn/$deckId"
+    }
     object Result : Screen("result/{score}/{total}/{deckId}") {
         fun createRoute(score: Int, total: Int, deckId: Int) =
             "result/$score/$total/$deckId" }
