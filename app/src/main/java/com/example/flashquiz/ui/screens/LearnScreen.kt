@@ -12,6 +12,8 @@ import com.example.flashquiz.data.model.LearnUiState
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.flashquiz.data.model.Flashcard
 import com.example.flashquiz.ui.theme.FlashQuizTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 fun LearnScreen(
@@ -45,6 +47,70 @@ fun LearnScreen(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+
+        if (state.isFinished) {
+            Text(
+                text = "Learning completed!",
+                style = MaterialTheme.typography.titleLarge
+            )
+
+            Text("Correct answers: ${state.correctAnswers}")
+            Text("Wrong answers: ${state.wrongAnswers}")
+
+        } else {
+            val card = state.currentCard
+
+            if (card != null) {
+
+                Text(
+                    text = "Question ${state.currentIndex + 1} of ${state.total}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                LinearProgressIndicator(
+                    progress = {
+                        state.currentIndex.toFloat() / state.total.coerceAtLeast(1)
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
+                ) {
+                    Text(
+                        text = card.question,
+                        modifier = Modifier.padding(24.dp),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+
+                Text(
+                    text = "Choose the correct answer",
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                state.answerOptions.forEach { option ->
+                    OutlinedCard(
+                        onClick = { onAnswerSelected(option) },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(14.dp)
+                    ) {
+                        Text(
+                            text = option,
+                            modifier = Modifier.padding(18.dp),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+            }
+        }
+
     }
 }
 
