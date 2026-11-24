@@ -126,6 +126,42 @@ class FlashQuizViewModel : ViewModel() {
         )
     }
 
+    fun submitLearnAnswer(answer: String) {
+        _learnState.update { state ->
+            val card = state.currentCard
+
+            if (card == null || state.isFinished) {
+                state
+            } else {
+                val isCorrect = answer.trim()
+                    .equals(card.answer.trim(), ignoreCase = true)
+
+                val nextIndex = state.currentIndex + 1
+                val finished = nextIndex >= state.cards.size
+
+                val nextOptions = if (finished) {
+                    emptyList()
+                } else {
+                    generateAnswerOptions(
+                        card = state.cards[nextIndex],
+                        deckCards = state.cards
+                    )
+                }
+
+                state.copy(
+                    correctAnswers = state.correctAnswers +
+                            if (isCorrect) 1 else 0,
+                    wrongAnswers = state.wrongAnswers +
+                            if (isCorrect) 0 else 1,
+                    currentIndex = nextIndex,
+                    answerOptions = nextOptions,
+                    isFinished = finished
+                )
+            }
+        }
+    }
+
+
     fun flipCard() {
         _flashcardState.update { state -> state.copy(isFlipped = !state.isFlipped) }
     }
