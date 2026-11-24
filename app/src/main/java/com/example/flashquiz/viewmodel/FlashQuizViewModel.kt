@@ -78,6 +78,39 @@ class FlashQuizViewModel : ViewModel() {
         val cards = getDeck(deckId)?.cards.orEmpty()
         _flashcardState.value = FlashcardUiState(deckId = deckId, cards = cards)
     }
+    private fun generateAnswerOptions(
+        card: Flashcard,
+        deckCards: List<Flashcard>
+    ): List<String> {
+
+        val correctAnswer = card.answer.trim()
+
+        val manualOptions = card.wrongAnswers
+            .map { it.trim() }
+            .filter { it.isNotBlank() }
+            .filter { !it.equals(correctAnswer, ignoreCase = true) }
+            .distinctBy { it.lowercase() }
+            .take(3)
+
+        val otherOptions = deckCards
+            .filter { it.id != card.id }
+            .map { it.answer.trim() }
+            .filter { it.isNotBlank() }
+            .filter { !it.equals(correctAnswer, ignoreCase = true) }
+            .filter { candidate ->
+                manualOptions.none {
+                    it.equals(candidate, ignoreCase = true)
+                }
+            }
+            .distinctBy { it.lowercase() }
+            .shuffled()
+
+        val wrongOptions = (manualOptions + otherOptions)
+            .distinctBy { it.lowercase() }
+            .take(3)
+
+        return (wrongOptions + correctAnswer).shuffled()
+    }
     fun startLearn(deckId: Int) {
         val cards = getDeck(deckId)?.cards.orEmpty().shuffled()
         _learnState.value = LearnUiState(
