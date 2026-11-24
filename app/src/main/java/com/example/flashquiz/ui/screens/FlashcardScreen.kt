@@ -33,12 +33,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.flashquiz.data.model.Flashcard
-import com.example.flashquiz.data.model.StudyUiState
+import com.example.flashquiz.data.model.FlashcardUiState
 import com.example.flashquiz.ui.theme.FlashQuizTheme
 
 @Composable
 fun FlashcardScreen(
-    state: StudyUiState,
+    state: FlashcardUiState,
     onFlip: () -> Unit,
     onNext: () -> Unit,
     onPrevious: () -> Unit,
@@ -167,7 +167,7 @@ fun FlashcardScreen(
 fun FlashcardScreenPreview() {
     FlashQuizTheme {
         FlashcardScreen(
-            state = StudyUiState(
+            state = FlashcardUiState(
                 cards = listOf(
                     Flashcard(1, "What is Jetpack Compose?", "Modern UI toolkit for Android")
                 )

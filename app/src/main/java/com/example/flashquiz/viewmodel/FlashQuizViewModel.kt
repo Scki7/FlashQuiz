@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import com.example.flashquiz.data.model.StudyUiState
+import com.example.flashquiz.data.model.FlashcardUiState
 
 class FlashQuizViewModel : ViewModel() {
 
@@ -18,12 +18,8 @@ class FlashQuizViewModel : ViewModel() {
     private val _quizState = MutableStateFlow(QuizUiState())
     val quizState: StateFlow<QuizUiState> = _quizState.asStateFlow()
 
-    private val _studyState = MutableStateFlow(StudyUiState())
-    val studyState: StateFlow<StudyUiState> = _studyState.asStateFlow()
-
-
-
-
+    private val _flashcardState = MutableStateFlow(FlashcardUiState())
+    val flashcardState: StateFlow<FlashcardUiState> = _flashcardState.asStateFlow()
 
     fun getDeck(deckId: Int): Deck? = _decks.value.find { it.id == deckId }
     fun addDeck(name: String) {
@@ -85,17 +81,17 @@ class FlashQuizViewModel : ViewModel() {
         }
     }
 
-    fun startStudy(deckId: Int) {
+    fun startFlashcards(deckId: Int) {
         val cards = getDeck(deckId)?.cards.orEmpty()
-        _studyState.value = StudyUiState(deckId = deckId, cards = cards)
+        _flashcardState.value = FlashcardUiState(deckId = deckId, cards = cards)
     }
 
     fun flipCard() {
-        _studyState.update { state -> state.copy(isFlipped = !state.isFlipped) }
+        _flashcardState.update { state -> state.copy(isFlipped = !state.isFlipped) }
     }
 
     fun nextCard() {
-        _studyState.update { state ->
+        _flashcardState.update { state ->
             if (state.isLast) {
                 state
             } else {
@@ -105,7 +101,7 @@ class FlashQuizViewModel : ViewModel() {
     }
 
     fun previousCard() {
-        _studyState.update { state ->
+        _flashcardState.update { state ->
             if (state.isFirst) {
                 state
             } else {
@@ -115,7 +111,7 @@ class FlashQuizViewModel : ViewModel() {
     }
 
     fun toggleKnown() {
-        _studyState.update { state ->
+        _flashcardState.update { state ->
             val card = state.currentCard
             if (card == null) {
                 state
@@ -127,8 +123,8 @@ class FlashQuizViewModel : ViewModel() {
         }
     }
 
-    fun shuffleStudy() {
-        _studyState.update { state ->
+    fun shuffleFlashcards() {
+        _flashcardState.update { state ->
             state.copy(cards = state.cards.shuffled(), currentIndex = 0, isFlipped = false)
         }
     }

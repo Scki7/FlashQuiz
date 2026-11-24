@@ -26,7 +26,7 @@ fun AppNavGraph(
 ) {
     val decks by viewModel.decks.collectAsState()
     val quizState by viewModel.quizState.collectAsState()
-    val studyState by viewModel.studyState.collectAsState()
+    val flashcardState by viewModel.flashcardState.collectAsState()
 
     NavHost(
         navController = navController,
@@ -56,8 +56,8 @@ fun AppNavGraph(
                     navController.navigate(Screen.AddCard.createRoute(deckId))
                 },
                 onStudy = {
-                    viewModel.startStudy(deckId)
-                    navController.navigate(Screen.Study.createRoute(deckId))
+                    viewModel.startFlashcards(deckId)
+                    navController.navigate(Screen.Flashcards.createRoute(deckId))
                 },
                 onStartQuiz = {
                     viewModel.startQuiz(deckId)
@@ -134,11 +134,11 @@ fun AppNavGraph(
         }
 
         composable(
-            route = Screen.Study.route,
+            route = Screen.Flashcards.route,
             arguments = listOf(navArgument("deckId") { type = NavType.IntType })
         ) {
             FlashcardScreen(
-                state = studyState,
+                state = flashcardState,
                 onFlip = { viewModel.flipCard() },
                 onNext = { viewModel.nextCard() },
                 onPrevious = { viewModel.previousCard() },

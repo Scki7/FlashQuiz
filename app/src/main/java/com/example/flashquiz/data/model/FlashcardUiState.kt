@@ -1,6 +1,6 @@
 package com.example.flashquiz.data.model
 
-data class StudyUiState(
+data class FlashcardUiState(
     val deckId: Int = -1,
     val cards: List<Flashcard> = emptyList(),
     val currentIndex: Int = 0,
