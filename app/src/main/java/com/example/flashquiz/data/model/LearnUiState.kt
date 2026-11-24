@@ -7,7 +7,8 @@ data class LearnUiState(
     val correctAnswers: Int = 0,
     val wrongAnswers: Int = 0,
     val isFinished: Boolean = false,
-    val answerOptions: List<String> = emptyList()
+    val answerOptions: List<String> = emptyList(),
+    val selectedAnswer: String? = null
 ) {
     val currentCard: Flashcard?
         get() = cards.getOrNull(currentIndex)
