@@ -1,28 +1,24 @@
 package com.example.flashquiz.ui.screens
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Layers
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import com.example.flashquiz.data.model.Deck
 import com.example.flashquiz.data.model.Flashcard
 import com.example.flashquiz.ui.theme.FlashQuizTheme
@@ -31,64 +27,214 @@ import com.example.flashquiz.ui.theme.FlashQuizTheme
 fun DeckDetailScreen(
     deck: Deck?,
     onAddCard: () -> Unit,
+    onStudy: () -> Unit,
     onStartQuiz: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     if (deck == null) {
         Text("Deck not found", modifier = modifier.padding(24.dp))
-    } else {
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .statusBarsPadding()
-                .padding(16.dp)
+        return
+    }
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding()
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+    ) {
+
+        // Top bar
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(
-                onClick = onBack,
-                modifier = Modifier.padding(bottom = 8.dp)
-            ) {
+            IconButton(onClick = onBack) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back"
                 )
             }
 
-            Text(deck.name, style = MaterialTheme.typography.headlineMedium)
-            Text("${deck.cards.size} cards", style = MaterialTheme.typography.bodyMedium)
+            FilledTonalButton(onClick = onAddCard) {
+                Icon(
+                    Icons.Default.Add,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(Modifier.width(6.dp))
+                Text("Add card")
+            }
+        }
 
-            LazyColumn(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(vertical = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(deck.cards, key = { it.id }) { card ->
-                    Card(modifier = Modifier.fillMaxWidth()) {
-                        Text(
-                            card.question,
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(16.dp)
-                        )
+        Spacer(Modifier.height(16.dp))
+
+        Text(
+            text = deck.name,
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold
+        )
+
+        Text(
+            text = "${deck.cards.size} cards",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Spacer(Modifier.height(24.dp))
+
+        // Cards section
+        Text(
+            text = "Cards",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.SemiBold
+        )
+
+        Spacer(Modifier.height(12.dp))
+
+        LazyColumn(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            itemsIndexed(
+                items = deck.cards,
+                key = { _, card -> card.id }
+            ) { index, card ->
+                var expanded by remember(card.id) {
+                    mutableStateOf(false)
+                }
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { expanded = !expanded },
+                    shape = RoundedCornerShape(14.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "${index + 1}.",
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Bold
+                            )
+
+                            Spacer(Modifier.width(12.dp))
+
+                            Text(
+                                text = card.question,
+                                modifier = Modifier.weight(1f)
+                            )
+
+                            Icon(
+                                Icons.Default.ChevronRight,
+                                contentDescription = null
+                            )
+                        }
+
+                        if (expanded) {
+                            HorizontalDivider(
+                                modifier = Modifier.padding(vertical = 12.dp)
+                            )
+
+                            Text(
+                                text = card.answer,
+                                color = MaterialTheme.colorScheme.primary,
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                        }
                     }
                 }
             }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .navigationBarsPadding()
-                    .padding(vertical = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                OutlinedButton(onClick = onAddCard, modifier = Modifier.weight(1f)) {
-                    Text("Add card")
-                }
-                Button(
-                    onClick = onStartQuiz,
-                    enabled = deck.cards.isNotEmpty(),
-                    modifier = Modifier.weight(1f)
-                ) { Text("Start quiz") }
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        // Study modes
+        Text(
+            text = "Study modes",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.SemiBold
+        )
+
+        Spacer(Modifier.height(12.dp))
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            StudyModeButton(
+                title = "Flashcards",
+                description = "Review cards and reveal answers",
+                icon = {
+                    Icon(Icons.Default.Layers, contentDescription = null)
+                },
+                onClick = onStudy,
+                enabled = deck.cards.isNotEmpty()
+            )
+
+            // Learn mode will be added here later.
+
+            StudyModeButton(
+                title = "Test",
+                description = "Check your knowledge",
+                icon = {
+                    Icon(Icons.Default.CheckCircle, contentDescription = null)
+                },
+                onClick = onStartQuiz,
+                enabled = deck.cards.isNotEmpty()
+            )
+        }
+    }
+}
+
+@Composable
+private fun StudyModeButton(
+    title: String,
+    description: String,
+    icon: @Composable () -> Unit,
+    onClick: () -> Unit,
+    enabled: Boolean
+) {
+    OutlinedCard(
+        onClick = onClick,
+        enabled = enabled,
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            icon()
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
+
+            Icon(
+                Icons.Default.ChevronRight,
+                contentDescription = null
+            )
         }
     }
 }
@@ -102,24 +248,15 @@ fun DeckDetailScreenPreview() {
                 1,
                 "Kotlin basics",
                 listOf(
-                    Flashcard(1, "Q1?", "A"),
-                    Flashcard(2, "Q2?", "A"),
-                    Flashcard(3, "Q2?", "A"),
-                    Flashcard(4, "Q2?", "A"),
-                    Flashcard(5, "Q2?", "A"),
-                    Flashcard(6, "Q2?", "A"),
-                    Flashcard(7, "Q2?", "A"),
-                    Flashcard(8, "Q2?", "A"),
-                    Flashcard(9, "Q2?", "A"),
-                    Flashcard(10, "Q2?", "A"),
-                    Flashcard(11, "Q2?", "A"),
-                    Flashcard(12, "Q2?", "A"),
-                    Flashcard(13, "Q2?", "A"),
+                    Flashcard(1, "Keyword for a read-only variable?", "val"),
+                    Flashcard(2, "Keyword for a mutable variable?", "var"),
+                    Flashcard(3, "Keyword to declare a function?", "fun")
                 )
             ),
-            onBack = {},
             onAddCard = {},
-            onStartQuiz = {}
+            onStudy = {},
+            onStartQuiz = {},
+            onBack = {}
         )
     }
 }
