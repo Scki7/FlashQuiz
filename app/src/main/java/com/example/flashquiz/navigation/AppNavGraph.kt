@@ -18,6 +18,7 @@ import com.example.flashquiz.ui.screens.FlashcardScreen
 import com.example.flashquiz.ui.screens.QuizScreen
 import com.example.flashquiz.ui.screens.ResultScreen
 import com.example.flashquiz.viewmodel.FlashQuizViewModel
+import com.example.flashquiz.ui.screens.LearnScreen
 
 @Composable
 fun AppNavGraph(
@@ -27,7 +28,7 @@ fun AppNavGraph(
     val decks by viewModel.decks.collectAsState()
     val quizState by viewModel.quizState.collectAsState()
     val flashcardState by viewModel.flashcardState.collectAsState()
-
+    val learnState by viewModel.learnState.collectAsState()
     NavHost(
         navController = navController,
         startDestination = Screen.DeckList.route
@@ -151,5 +152,33 @@ fun AppNavGraph(
                 onBack = { navController.popBackStack() }
             )
         }
+
+        composable(
+            route = Screen.Learn.route,
+            arguments = listOf(
+                navArgument("deckId") {
+                    type = NavType.IntType
+                }
+            )
+        ) { entry ->
+            val deckId = entry.arguments?.getInt("deckId") ?: -1
+
+            LaunchedEffect(deckId) {
+                if (deckId != -1) {
+                    viewModel.startLearn(deckId)
+                }
+            }
+
+            LearnScreen(
+                state = learnState,
+                onAnswerSelected = { answer ->
+                    viewModel.submitLearnAnswer(answer)
+                },
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
     }
 }
