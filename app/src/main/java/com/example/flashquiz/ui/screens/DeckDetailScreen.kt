@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -31,11 +32,22 @@ fun DeckDetailScreen(
     onStartLearn: () -> Unit,
     onStartQuiz: () -> Unit,
     onBack: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onUpdateCard: (Int, Int, String, String, List<String>) -> Unit ,
+    onDeleteCard: (Int) -> Unit
 ) {
     if (deck == null) {
         Text("Deck not found", modifier = modifier.padding(24.dp))
         return
+    }
+    // Edit and Delete card state
+    var editingCardId by rememberSaveable { mutableStateOf<Int?>(null) }
+    var deletingCardId by rememberSaveable { mutableStateOf<Int?>(null) }
+
+    var editedQuestion by rememberSaveable { mutableStateOf("") }
+    var editedAnswer by rememberSaveable { mutableStateOf("") }
+    var editedWrongAnswers by rememberSaveable {
+        mutableStateOf(listOf("", "", ""))
     }
 
     Column(
@@ -152,6 +164,32 @@ fun DeckDetailScreen(
                                 style = MaterialTheme.typography.bodyLarge
                             )
                         }
+                        // Edit and Delete buttons
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            TextButton(
+                                onClick = {
+                                    editingCardId = card.id
+                                    editedQuestion = card.question
+                                    editedAnswer = card.answer
+                                    editedWrongAnswers = List(3) { index ->
+                                        card.wrongAnswers.getOrElse(index) { "" }
+                                    }
+                                }
+                            ) {
+                                Text("Edit")
+                            }
+
+                            TextButton(
+                                onClick = {
+                                    deletingCardId = card.id
+                                }
+                            ) {
+                                Text("Delete")
+                            }
+                        }
                     }
                 }
             }
@@ -205,7 +243,100 @@ fun DeckDetailScreen(
                 enabled = deck.cards.isNotEmpty()
             )
         }
+
+        // Edit card dialog
+        if (editingCardId != null) {
+            AlertDialog(
+                onDismissRequest = { editingCardId = null },
+                title = { Text("Edit card") },
+                text = {
+                    Column {
+                        OutlinedTextField(
+                            value = editedQuestion,
+                            onValueChange = { editedQuestion = it },
+                            label = { Text("Question") }
+                        )
+
+                        OutlinedTextField(
+                            value = editedAnswer,
+                            onValueChange = { editedAnswer = it },
+                            label = { Text("Correct answer") }
+                        )
+
+                        editedWrongAnswers.forEachIndexed { index, answer ->
+                            OutlinedTextField(
+                                value = answer,
+                                onValueChange = { newValue ->
+                                    editedWrongAnswers =
+                                        editedWrongAnswers.toMutableList().also {
+                                            it[index] = newValue
+                                        }
+                                },
+                                label = {
+                                    Text("Wrong answer ${index + 1}")
+                                }
+                            )
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            editingCardId?.let { cardId ->
+                                onUpdateCard(
+                                    cardId,
+                                    deck.id,
+                                    editedQuestion,
+                                    editedAnswer,
+                                    editedWrongAnswers
+                                )
+                            }
+                            editingCardId = null
+                        },
+                        enabled = editedQuestion.isNotBlank() &&
+                                editedAnswer.isNotBlank()
+                    ) {
+                        Text("Save")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { editingCardId = null }) {
+                        Text("Cancel")
+                    }
+                }
+            )
+        }
+
     }
+
+    // Delete card dialog
+    if (deletingCardId != null) {
+        AlertDialog(
+            onDismissRequest = { deletingCardId = null },
+            title = { Text("Delete card?") },
+            text = {
+                Text("Are you sure you want to delete this card?")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        deletingCardId?.let { cardId ->
+                            onDeleteCard(cardId)
+                        }
+                        deletingCardId = null
+                    }
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { deletingCardId = null }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
 }
 
 @Composable
@@ -270,7 +401,9 @@ fun DeckDetailScreenPreview() {
             onStudy = {},
             onStartLearn = {},
             onStartQuiz = {},
-            onBack = {}
+            onBack = {},
+            onUpdateCard =  { _, _, _, _, _ -> },
+            onDeleteCard = {}
         )
     }
 }

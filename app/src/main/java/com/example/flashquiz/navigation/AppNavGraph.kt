@@ -73,7 +73,19 @@ fun AppNavGraph(
                     viewModel.startQuiz(deckId)
                     navController.navigate(Screen.Quiz.createRoute(deckId))
                 },
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                onUpdateCard = { cardId, deckId, question, answer, wrongAnswers ->
+                    viewModel.updateCard(
+                        cardId,
+                        deckId,
+                        question,
+                        answer,
+                        wrongAnswers
+                    )
+                },
+                onDeleteCard = { cardId ->
+                    viewModel.deleteCard(cardId)
+                }
             )
         }
 
