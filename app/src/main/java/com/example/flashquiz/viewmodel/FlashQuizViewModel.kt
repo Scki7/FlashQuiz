@@ -121,6 +121,7 @@ class FlashQuizViewModel : ViewModel() {
         _learnState.value = LearnUiState(
             deckId = deckId,
             cards = cards,
+            originalTotal = cards.size,
             answerOptions = options,
             isFinished = cards.isEmpty()
         )

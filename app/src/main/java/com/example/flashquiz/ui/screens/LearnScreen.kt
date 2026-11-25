@@ -79,14 +79,13 @@ fun LearnScreen(
 
                 // Question progress
                 Text(
-                    text = "Question ${state.currentIndex + 1} of ${state.total}",
-                    style = MaterialTheme.typography.bodyMedium,
+                    text = "Mastered ${state.correctAnswers} of ${state.total}",                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 LinearProgressIndicator(
                     progress = {
-                        state.currentIndex.toFloat() /
+                        state.correctAnswers.toFloat() /
                                 state.total.coerceAtLeast(1)
                     },
                     modifier = Modifier.fillMaxWidth()
@@ -204,6 +203,7 @@ fun LearnScreenPreview() {
         LearnScreen(
             state = LearnUiState(
                 deckId = 1,
+                originalTotal = 1,
                 cards = listOf(
                     Flashcard(
                         id = 1,
@@ -240,6 +240,7 @@ fun LearnScreenIncorrectPreview() {
         LearnScreen(
             state = LearnUiState(
                 deckId = 1,
+                originalTotal = 1,
                 cards = listOf(
                     Flashcard(
                         id = 1,

@@ -9,11 +9,12 @@ data class LearnUiState(
     val isFinished: Boolean = false,
     val answerOptions: List<String> = emptyList(),
     val retryCards: List<Flashcard> = emptyList(),
-    val selectedAnswer: String? = null
+    val selectedAnswer: String? = null,
+    val originalTotal: Int = 0,
 ) {
     val currentCard: Flashcard?
         get() = cards.getOrNull(currentIndex)
 
     val total: Int
-        get() = cards.size
+        get() = originalTotal
 }
