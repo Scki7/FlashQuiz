@@ -172,6 +172,7 @@ fun AppNavGraph(
                 }
             }
 
+
             LearnScreen(
                 state = learnState,
                 onAnswerSelected = { answer ->
@@ -180,10 +181,14 @@ fun AppNavGraph(
                 onContinue = {
                     viewModel.nextLearnQuestion()
                 },
+                onPracticeAgain = {
+                    viewModel.startLearn(deckId)
+                },
                 onBack = {
                     navController.popBackStack()
                 }
             )
+
         }
 
     }

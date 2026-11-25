@@ -24,6 +24,7 @@ fun LearnScreen(
     state: LearnUiState,
     onAnswerSelected: (String) -> Unit,
     onContinue: () -> Unit,
+    onPracticeAgain: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -126,6 +127,28 @@ fun LearnScreen(
                     }
                 }
             }
+            Button(
+                onClick = onPracticeAgain,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(14.dp)
+            ) {
+                Text(
+                    text = "Practice Again",
+                    modifier = Modifier.padding(8.dp)
+                )
+            }
+
+            OutlinedButton(
+                onClick = onBack,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(14.dp)
+            ) {
+                Text(
+                    text = "Back to Deck",
+                    modifier = Modifier.padding(8.dp)
+                )
+            }
+
 
         } else {
 
@@ -280,6 +303,7 @@ fun LearnScreenPreview() {
                 )
             ),
             onAnswerSelected = {},
+            onPracticeAgain = {},
             onContinue ={} ,
             onBack = {}
         )
@@ -320,6 +344,7 @@ fun LearnScreenIncorrectPreview() {
             ),
             onAnswerSelected = {},
             onContinue = {},
+            onPracticeAgain = {},
             onBack = {}
         )
     }
@@ -343,6 +368,7 @@ fun LearnScreenCompletedPreview() {
             ),
             onAnswerSelected = {},
             onContinue = {},
+            onPracticeAgain = {},
             onBack = {}
         )
     }
