@@ -42,13 +42,15 @@ class FlashQuizRepository(
     suspend fun addCard(
         deckId: Int,
         question: String,
-        answer: String
+        answer: String,
+        wrongAnswers: List<String> = emptyList()
     ): Long {
         return flashcardDao.insertCard(
             FlashcardEntity(
                 deckId = deckId,
                 question = question,
-                answer = answer
+                answer = answer,
+                wrongAnswers = wrongAnswers
             )
         )
     }

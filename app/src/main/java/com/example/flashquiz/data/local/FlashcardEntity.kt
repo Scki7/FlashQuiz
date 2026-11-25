@@ -22,5 +22,6 @@ data class FlashcardEntity(
     val id: Int = 0,
     val deckId: Int,
     val question: String,
-    val answer: String
+    val answer: String,
+    val wrongAnswers: List<String> = emptyList()
 )
