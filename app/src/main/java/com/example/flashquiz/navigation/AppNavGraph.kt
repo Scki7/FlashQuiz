@@ -177,6 +177,9 @@ fun AppNavGraph(
                 onAnswerSelected = { answer ->
                     viewModel.submitLearnAnswer(answer)
                 },
+                onContinue = {
+                    viewModel.nextLearnQuestion()
+                },
                 onBack = {
                     navController.popBackStack()
                 }

@@ -151,6 +151,35 @@ class FlashQuizViewModel : ViewModel() {
         }
     }
 
+    fun nextLearnQuestion() {
+        _learnState.update { state ->
+
+            if (state.isFinished || state.selectedAnswer == null) {
+                state
+            } else {
+                val nextIndex = state.currentIndex + 1
+                val finished = nextIndex >= state.cards.size
+
+                val nextOptions = if (finished) {
+                    emptyList()
+                } else {
+                    generateAnswerOptions(
+                        card = state.cards[nextIndex],
+                        deckCards = state.cards
+                    )
+                }
+
+                state.copy(
+                    currentIndex = nextIndex,
+                    answerOptions = nextOptions,
+                    selectedAnswer = null,
+                    isFinished = finished
+                )
+            }
+        }
+    }
+
+
 
     fun flipCard() {
         _flashcardState.update { state -> state.copy(isFlipped = !state.isFlipped) }

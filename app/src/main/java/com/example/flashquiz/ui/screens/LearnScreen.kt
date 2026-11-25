@@ -22,6 +22,7 @@ import com.example.flashquiz.ui.theme.IncorrectText
 fun LearnScreen(
     state: LearnUiState,
     onAnswerSelected: (String) -> Unit,
+    onContinue: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -174,6 +175,20 @@ fun LearnScreen(
                         )
                     }
                 }
+
+                if (state.selectedAnswer != null) {
+                    Button(
+                        onClick = onContinue,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(14.dp)
+                    ) {
+                        Text(
+                            text = "Continue",
+                            modifier = Modifier.padding(8.dp)
+                        )
+                    }
+                }
+
             }
         }
     }
@@ -209,6 +224,7 @@ fun LearnScreenPreview() {
                 )
             ),
             onAnswerSelected = {},
+            onContinue ={} ,
             onBack = {}
         )
     }
@@ -246,6 +262,7 @@ fun LearnScreenIncorrectPreview() {
                 wrongAnswers = 1
             ),
             onAnswerSelected = {},
+            onContinue = {},
             onBack = {}
         )
     }
