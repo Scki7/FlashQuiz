@@ -151,6 +151,9 @@ fun AppNavGraph(
                 onFlip = { viewModel.flipCard() },
                 onNext = { viewModel.nextCard() },
                 onPrevious = { viewModel.previousCard() },
+                onFinish = {
+                    navController.popBackStack()
+                },
                 onToggleKnown = { viewModel.toggleKnown() },
                 onBack = { navController.popBackStack() }
             )
