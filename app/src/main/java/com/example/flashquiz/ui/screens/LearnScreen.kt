@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,21 +56,76 @@ fun LearnScreen(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
+
         if (state.isFinished) {
 
-            // Learning results
-            Text(
-                text = "Learning completed!",
-                style = MaterialTheme.typography.titleLarge
-            )
+            Spacer(modifier = Modifier.height(24.dp))
 
-            Text(
-                text = "Correct answers: ${state.correctAnswers}"
-            )
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Learning completed!",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold
+                    )
 
-            Text(
-                text = "Wrong answers: ${state.wrongAnswers}"
-            )
+                    Text(
+                        text = "${state.correctAnswers} / ${state.total}",
+                        style = MaterialTheme.typography.displayMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Text(
+                        text = "Cards mastered",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    LinearProgressIndicator(
+                        progress = { 1f },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    HorizontalDivider()
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text("Correct answers")
+                        Text(
+                            text = "${state.correctAnswers}",
+                            color = CorrectText,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text("Wrong attempts")
+                        Text(
+                            text = "${state.wrongAnswers}",
+                            color = IncorrectText,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
 
         } else {
 
@@ -261,6 +317,29 @@ fun LearnScreenIncorrectPreview() {
                 ),
                 selectedAnswer = "var",
                 wrongAnswers = 1
+            ),
+            onAnswerSelected = {},
+            onContinue = {},
+            onBack = {}
+        )
+    }
+}
+
+@Preview(
+    name = "Learn - Completed",
+    showBackground = true,
+    showSystemUi = true
+)
+@Composable
+fun LearnScreenCompletedPreview() {
+    FlashQuizTheme {
+        LearnScreen(
+            state = LearnUiState(
+                deckId = 1,
+                originalTotal = 3,
+                correctAnswers = 3,
+                wrongAnswers = 2,
+                isFinished = true
             ),
             onAnswerSelected = {},
             onContinue = {},
