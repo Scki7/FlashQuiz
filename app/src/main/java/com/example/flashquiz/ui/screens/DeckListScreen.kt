@@ -26,21 +26,30 @@ import com.example.flashquiz.data.model.Deck
 import com.example.flashquiz.data.model.Flashcard
 import com.example.flashquiz.ui.components.DeckCard
 import com.example.flashquiz.ui.theme.FlashQuizTheme
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Arrangement
 
 @Composable
 fun DeckListScreen(
     decks: List<Deck>,
     onDeckClick: (Int) -> Unit,
     onAddDeck: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onUpdateDeck: (Int, String) -> Unit,
+    onDeleteDeck: (Int) -> Unit
 ) {
     var showDialog by rememberSaveable { mutableStateOf(false) }
     var newName by rememberSaveable { mutableStateOf("") }
 
+    // Edit and Delete state
+    var editingDeckId by rememberSaveable { mutableStateOf<Int?>(null) }
+    var editedName by rememberSaveable { mutableStateOf("") }
+    var deletingDeckId by rememberSaveable { mutableStateOf<Int?>(null) }
+
     Column(
         modifier = modifier
-        .fillMaxSize()
-        .statusBarsPadding()
+            .fillMaxSize()
+            .statusBarsPadding()
     ) {
         LazyColumn(
             modifier = Modifier.weight(1f),
@@ -55,6 +64,31 @@ fun DeckListScreen(
                     cardCount = deck.cards.size,
                     onClick = { onDeckClick(deck.id) }
                 )
+
+                // Edit and Delete buttons
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(
+                        onClick = {
+                            editingDeckId = deck.id
+                            editedName = deck.name
+                        }
+                    ) {
+                        Text("Edit")
+                    }
+
+                    TextButton(
+                        onClick = {
+                            deletingDeckId = deck.id
+                        }
+                    ) {
+                        Text("Delete")
+                    }
+                }
             }
         }
         Button(
@@ -95,6 +129,63 @@ fun DeckListScreen(
         )
     }
 
+    // Edit deck dialog
+    if (editingDeckId != null) {
+        AlertDialog(
+            onDismissRequest = { editingDeckId = null },
+            title = { Text("Edit deck") },
+            text = {
+                OutlinedTextField(
+                    value = editedName,
+                    onValueChange = { editedName = it },
+                    label = { Text("Deck name") },
+                    singleLine = true
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        editingDeckId?.let { id ->
+                            onUpdateDeck(id, editedName)
+                        }
+                        editingDeckId = null
+                    },
+                    enabled = editedName.isNotBlank()
+                ) { Text("Save") }
+            },
+            dismissButton = {
+                TextButton(onClick = { editingDeckId = null }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    // Delete confirmation dialog
+    if (deletingDeckId != null) {
+        AlertDialog(
+            onDismissRequest = { deletingDeckId = null },
+            title = { Text("Delete deck?") },
+            text = {
+                Text("This deck and all its flashcards will be deleted.")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        deletingDeckId?.let { id ->
+                            onDeleteDeck(id)
+                        }
+                        deletingDeckId = null
+                    }
+                ) { Text("Delete") }
+            },
+            dismissButton = {
+                TextButton(onClick = { deletingDeckId = null }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 }
 
 @Preview(showBackground = true)
@@ -127,7 +218,9 @@ fun DeckListScreenPreview() {
         DeckListScreen(
             decks = sampleDecks,
             onDeckClick = {},
-            onAddDeck = {}
+            onAddDeck = {},
+            onUpdateDeck =  { _, _ -> },
+            onDeleteDeck = {}
         )
     }
 }

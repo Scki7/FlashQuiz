@@ -40,7 +40,13 @@ fun AppNavGraph(
                 onDeckClick = { id ->
                     navController.navigate(Screen.DeckDetail.createRoute(id))
                 },
-                onAddDeck = { name -> viewModel.addDeck(name) }
+                onAddDeck = { name -> viewModel.addDeck(name) },
+                onUpdateDeck = { deckId, newName ->
+                    viewModel.updateDeck(deckId, newName)
+                },
+                onDeleteDeck = { deckId ->
+                    viewModel.deleteDeck(deckId)
+                }
             )
         }
 
