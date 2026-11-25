@@ -9,12 +9,59 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import com.example.flashquiz.data.model.FlashcardUiState
 import com.example.flashquiz.data.model.LearnUiState
+import androidx.lifecycle.viewModelScope
+import com.example.flashquiz.data.repository.FlashQuizRepository
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+@OptIn(ExperimentalCoroutinesApi::class)
+class FlashQuizViewModel(
+    private val repository: FlashQuizRepository
+) : ViewModel() {
 
-class FlashQuizViewModel : ViewModel() {
-    private var nextDeckId = 3
-    private var nextCardId = 100
-    private val _decks = MutableStateFlow(sampleDecks())
+    private val _decks = MutableStateFlow<List<Deck>>(emptyList())
     val decks: StateFlow<List<Deck>> = _decks.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            repository.getAllDecks()
+                .flatMapLatest { deckEntities ->
+
+                    if (deckEntities.isEmpty()) {
+                        flowOf(emptyList<Deck>())
+                    } else {
+                        combine(
+                            deckEntities.map { deckEntity ->
+                                repository.getCardsByDeck(deckEntity.id)
+                            }
+                        ) { cardLists ->
+
+                            deckEntities.mapIndexed { index, deckEntity ->
+                                Deck(
+                                    id = deckEntity.id,
+                                    name = deckEntity.name,
+                                    cards = cardLists[index].map { card ->
+                                        Flashcard(
+                                            id = card.id,
+                                            question = card.question,
+                                            answer = card.answer,
+                                            wrongAnswers = card.wrongAnswers
+                                        )
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+                .collectLatest { loadedDecks ->
+                    _decks.value = loadedDecks
+                }
+        }
+    }
+
     private val _quizState = MutableStateFlow(QuizUiState())
     val quizState: StateFlow<QuizUiState> = _quizState.asStateFlow()
     private val _flashcardState = MutableStateFlow(FlashcardUiState())
@@ -24,7 +71,10 @@ class FlashQuizViewModel : ViewModel() {
     fun getDeck(deckId: Int): Deck? = _decks.value.find { it.id == deckId }
     fun addDeck(name: String) {
         if (name.isBlank()) return
-        _decks.update { it + Deck(id = nextDeckId++, name = name.trim()) }
+
+        viewModelScope.launch {
+            repository.addDeck(name.trim())
+        }
     }
     fun addCard(
         deckId: Int,
@@ -33,18 +83,17 @@ class FlashQuizViewModel : ViewModel() {
         wrongAnswers: List<String>
     ) {
         if (question.isBlank() || answer.isBlank()) return
-        val card = Flashcard(
-               id = nextCardId++,
-            question = question.trim(),
-            answer = answer.trim(),
-            wrongAnswers = wrongAnswers
-        )
-        _decks.update { list ->
-            list.map { deck ->
-                if (deck.id == deckId) deck.copy(cards = deck.cards + card) else deck
-            }
+
+        viewModelScope.launch {
+            repository.addCard(
+                deckId = deckId,
+                question = question.trim(),
+                answer = answer.trim(),
+                wrongAnswers = wrongAnswers
+            )
         }
     }
+
     fun startQuiz(deckId: Int) {
         val cards = getDeck(deckId)?.cards.orEmpty().shuffled()
         _quizState.value = QuizUiState(deckId = deckId, cards = cards)
@@ -244,21 +293,4 @@ class FlashQuizViewModel : ViewModel() {
             state.copy(cards = state.cards.shuffled(), currentIndex = 0, isFlipped = false)
         }
     }
-    private fun sampleDecks() = listOf(
-        Deck(
-            id = 1, name = "Kotlin basics",
-            cards = listOf(
-                Flashcard(1, "Keyword for a read-only variable?", "val"),
-                Flashcard(2, "Keyword for a mutable variable?", "var"),
-                Flashcard(3, "Keyword to declare a function?", "fun")
-            )
-        ),
-        Deck(
-            id = 2, name = "English words",
-            cards = listOf(
-                Flashcard(4, "Translate: яблоко", "apple"),
-                Flashcard(5, "Translate: книга", "book")
-            )
-        )
-    )
 }
