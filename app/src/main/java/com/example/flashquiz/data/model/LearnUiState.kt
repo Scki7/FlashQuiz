@@ -8,6 +8,7 @@ data class LearnUiState(
     val wrongAnswers: Int = 0,
     val isFinished: Boolean = false,
     val answerOptions: List<String> = emptyList(),
+    val retryCards: List<Flashcard> = emptyList(),
     val selectedAnswer: String? = null
 ) {
     val currentCard: Flashcard?

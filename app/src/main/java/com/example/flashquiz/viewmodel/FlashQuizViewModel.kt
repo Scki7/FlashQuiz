@@ -139,13 +139,18 @@ class FlashQuizViewModel : ViewModel() {
             } else {
                 val isCorrect = answer.trim()
                     .equals(card.answer.trim(), ignoreCase = true)
-
+                val updatedRetryCards = if (isCorrect) {
+                    state.retryCards
+                } else {
+                    state.retryCards + card
+                }
                 state.copy(
                     selectedAnswer = answer,
                     correctAnswers = state.correctAnswers +
                             if (isCorrect) 1 else 0,
                     wrongAnswers = state.wrongAnswers +
-                            if (isCorrect) 0 else 1
+                            if (isCorrect) 0 else 1,
+                    retryCards = updatedRetryCards
                 )
             }
         }
@@ -158,23 +163,41 @@ class FlashQuizViewModel : ViewModel() {
                 state
             } else {
                 val nextIndex = state.currentIndex + 1
-                val finished = nextIndex >= state.cards.size
 
-                val nextOptions = if (finished) {
-                    emptyList()
+                if (nextIndex < state.cards.size) {
+                    val nextCard = state.cards[nextIndex]
+
+                    state.copy(
+                        currentIndex = nextIndex,
+                        selectedAnswer = null,
+                        answerOptions = generateAnswerOptions(
+                            card = nextCard,
+                            deckCards = state.cards
+                        )
+                    )
+                } else if (state.retryCards.isNotEmpty()) {
+
+                    val retryCards = state.retryCards.shuffled()
+                    val nextCard = retryCards.first()
+
+                    state.copy(
+                        cards = retryCards,
+                        retryCards = emptyList(),
+                        currentIndex = 0,
+                        selectedAnswer = null,
+                        answerOptions = generateAnswerOptions(
+                            card = nextCard,
+                            deckCards = state.cards
+                        )
+                    )
                 } else {
-                    generateAnswerOptions(
-                        card = state.cards[nextIndex],
-                        deckCards = state.cards
+                    state.copy(
+                        currentIndex = state.cards.size,
+                        selectedAnswer = null,
+                        answerOptions = emptyList(),
+                        isFinished = true
                     )
                 }
-
-                state.copy(
-                    currentIndex = nextIndex,
-                    answerOptions = nextOptions,
-                    selectedAnswer = null,
-                    isFinished = finished
-                )
             }
         }
     }
