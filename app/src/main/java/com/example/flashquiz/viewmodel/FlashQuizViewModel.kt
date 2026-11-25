@@ -16,6 +16,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.collectLatest
+import com.example.flashquiz.data.local.DeckEntity
+import com.example.flashquiz.data.local.FlashcardEntity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 @OptIn(ExperimentalCoroutinesApi::class)
 class FlashQuizViewModel(
@@ -91,6 +93,59 @@ class FlashQuizViewModel(
                 answer = answer.trim(),
                 wrongAnswers = wrongAnswers
             )
+        }
+    }
+
+    fun updateDeck(deckId: Int, newName: String) {
+        if (newName.isBlank()) return
+
+        viewModelScope.launch {
+            repository.updateDeck(
+                DeckEntity(
+                    id = deckId,
+                    name = newName.trim()
+                )
+            )
+        }
+    }
+
+    fun deleteDeck(deckId: Int) {
+        viewModelScope.launch {
+            val deck = repository.getDeckById(deckId)
+            if (deck != null) {
+                repository.deleteDeck(deck)
+            }
+        }
+    }
+
+    fun updateCard(
+        cardId: Int,
+        deckId: Int,
+        question: String,
+        answer: String,
+        wrongAnswers: List<String>
+    ) {
+        if (question.isBlank() || answer.isBlank()) return
+
+        viewModelScope.launch {
+            repository.updateCard(
+                FlashcardEntity(
+                    id = cardId,
+                    deckId = deckId,
+                    question = question.trim(),
+                    answer = answer.trim(),
+                    wrongAnswers = wrongAnswers
+                )
+            )
+        }
+    }
+
+    fun deleteCard(cardId: Int) {
+        viewModelScope.launch {
+            val card = repository.getCardById(cardId)
+            if (card != null) {
+                repository.deleteCard(card)
+            }
         }
     }
 
