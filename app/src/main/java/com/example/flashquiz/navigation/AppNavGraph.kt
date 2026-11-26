@@ -15,22 +15,30 @@ import com.example.flashquiz.ui.screens.AddCardScreen
 import com.example.flashquiz.ui.screens.DeckDetailScreen
 import com.example.flashquiz.ui.screens.DeckListScreen
 import com.example.flashquiz.ui.screens.FlashcardScreen
+import com.example.flashquiz.ui.screens.ImportScreen
+import com.example.flashquiz.ui.screens.LearnScreen
 import com.example.flashquiz.ui.screens.QuizScreen
 import com.example.flashquiz.ui.screens.ResultScreen
-import com.example.flashquiz.viewmodel.FlashQuizViewModel
-import com.example.flashquiz.ui.screens.LearnScreen
 import com.example.flashquiz.ui.screens.SettingsScreen
+import com.example.flashquiz.viewmodel.FlashQuizViewModel
+import com.example.flashquiz.viewmodel.ImportViewModel
+
 @Composable
 fun AppNavGraph(
     navController: NavHostController = rememberNavController(),
     viewModel: FlashQuizViewModel = viewModel(),
     isDarkTheme: Boolean = false,
-    onThemeChange: (Boolean) -> Unit = {}
+    onThemeChange: (Boolean) -> Unit = {},
+    importViewModel: ImportViewModel = viewModel()
 ) {
     val decks by viewModel.decks.collectAsState()
     val quizState by viewModel.quizState.collectAsState()
     val flashcardState by viewModel.flashcardState.collectAsState()
     val learnState by viewModel.learnState.collectAsState()
+
+    val importState by importViewModel.uiState.collectAsState()
+    val selectedCategory by importViewModel.selectedCategory.collectAsState()
+
     NavHost(
         navController = navController,
         startDestination = Screen.DeckList.route
@@ -40,9 +48,13 @@ fun AppNavGraph(
             DeckListScreen(
                 decks = decks,
                 onDeckClick = { id ->
-                    navController.navigate(Screen.DeckDetail.createRoute(id))
+                    navController.navigate(
+                        Screen.DeckDetail.createRoute(id)
+                    )
                 },
-                onAddDeck = { name -> viewModel.addDeck(name) },
+                onAddDeck = { name ->
+                    viewModel.addDeck(name)
+                },
                 onUpdateDeck = { deckId, newName ->
                     viewModel.updateDeck(deckId, newName)
                 },
@@ -51,13 +63,20 @@ fun AppNavGraph(
                 },
                 onSettingsClick = {
                     navController.navigate("settings")
+                },
+                onImport = {
+                    navController.navigate(Screen.Import.route)
                 }
             )
         }
 
         composable(
             route = Screen.DeckDetail.route,
-            arguments = listOf(navArgument("deckId") { type = NavType.IntType })
+            arguments = listOf(
+                navArgument("deckId") {
+                    type = NavType.IntType
+                }
+            )
         ) { entry ->
             val deckId = entry.arguments?.getInt("deckId") ?: -1
             val deck = decks.find { it.id == deckId }
@@ -65,21 +84,32 @@ fun AppNavGraph(
             DeckDetailScreen(
                 deck = deck,
                 onAddCard = {
-                    navController.navigate(Screen.AddCard.createRoute(deckId))
+                    navController.navigate(
+                        Screen.AddCard.createRoute(deckId)
+                    )
                 },
                 onStudy = {
                     viewModel.startFlashcards(deckId)
-                    navController.navigate(Screen.Flashcards.createRoute(deckId))
+                    navController.navigate(
+                        Screen.Flashcards.createRoute(deckId)
+                    )
                 },
                 onStartLearn = {
-                    navController.navigate(Screen.Learn.createRoute(deckId))
+                    navController.navigate(
+                        Screen.Learn.createRoute(deckId)
+                    )
                 },
                 onStartQuiz = {
                     viewModel.startQuiz(deckId)
-                    navController.navigate(Screen.Quiz.createRoute(deckId))
+                    navController.navigate(
+                        Screen.Quiz.createRoute(deckId)
+                    )
                 },
-                onBack = { navController.popBackStack() },
-                onUpdateCard = { cardId, deckId, question, answer, wrongAnswers ->
+                onBack = {
+                    navController.popBackStack()
+                },
+                onUpdateCard = {
+                        cardId, deckId, question, answer, wrongAnswers ->
                     viewModel.updateCard(
                         cardId,
                         deckId,
@@ -96,7 +126,11 @@ fun AppNavGraph(
 
         composable(
             route = Screen.AddCard.route,
-            arguments = listOf(navArgument("deckId") { type = NavType.IntType })
+            arguments = listOf(
+                navArgument("deckId") {
+                    type = NavType.IntType
+                }
+            )
         ) { entry ->
             val deckId = entry.arguments?.getInt("deckId") ?: -1
 
@@ -110,40 +144,64 @@ fun AppNavGraph(
                     )
                     navController.popBackStack()
                 },
-                onBack = { navController.popBackStack() }
+                onBack = {
+                    navController.popBackStack()
+                }
             )
         }
 
         composable(
             route = Screen.Quiz.route,
-            arguments = listOf(navArgument("deckId") { type = NavType.IntType })
+            arguments = listOf(
+                navArgument("deckId") {
+                    type = NavType.IntType
+                }
+            )
         ) { entry ->
             val deckId = entry.arguments?.getInt("deckId") ?: -1
 
             LaunchedEffect(quizState.isFinished) {
                 if (quizState.isFinished) {
                     navController.navigate(
-                        Screen.Result.createRoute(quizState.score, quizState.total, deckId)
+                        Screen.Result.createRoute(
+                            quizState.score,
+                            quizState.total,
+                            deckId
+                        )
                     ) {
-                        popUpTo(Screen.Quiz.route) { inclusive = true }
+                        popUpTo(Screen.Quiz.route) {
+                            inclusive = true
+                        }
                     }
                 }
             }
 
             QuizScreen(
                 state = quizState,
-                onSubmit = { viewModel.submitAnswer(it) },
-                onNext = { viewModel.nextQuestion() },
-                onBack = { navController.popBackStack() }
+                onSubmit = {
+                    viewModel.submitAnswer(it)
+                },
+                onNext = {
+                    viewModel.nextQuestion()
+                },
+                onBack = {
+                    navController.popBackStack()
+                }
             )
         }
 
         composable(
             route = Screen.Result.route,
             arguments = listOf(
-                navArgument("score") { type = NavType.IntType },
-                navArgument("total") { type = NavType.IntType },
-                navArgument("deckId") { type = NavType.IntType }
+                navArgument("score") {
+                    type = NavType.IntType
+                },
+                navArgument("total") {
+                    type = NavType.IntType
+                },
+                navArgument("deckId") {
+                    type = NavType.IntType
+                }
             )
         ) { entry ->
             val score = entry.arguments?.getInt("score") ?: 0
@@ -155,30 +213,52 @@ fun AppNavGraph(
                 total = total,
                 onTryAgain = {
                     viewModel.startQuiz(deckId)
-                    navController.navigate(Screen.Quiz.createRoute(deckId)) {
-                        popUpTo(Screen.Result.route) { inclusive = true }
+
+                    navController.navigate(
+                        Screen.Quiz.createRoute(deckId)
+                    ) {
+                        popUpTo(Screen.Result.route) {
+                            inclusive = true
+                        }
                     }
                 },
                 onBackToDecks = {
-                    navController.popBackStack(Screen.DeckList.route, inclusive = false)
+                    navController.popBackStack(
+                        Screen.DeckList.route,
+                        inclusive = false
+                    )
                 }
             )
         }
 
         composable(
             route = Screen.Flashcards.route,
-            arguments = listOf(navArgument("deckId") { type = NavType.IntType })
+            arguments = listOf(
+                navArgument("deckId") {
+                    type = NavType.IntType
+                }
+            )
         ) {
             FlashcardScreen(
                 state = flashcardState,
-                onFlip = { viewModel.flipCard() },
-                onNext = { viewModel.nextCard() },
-                onPrevious = { viewModel.previousCard() },
+                onFlip = {
+                    viewModel.flipCard()
+                },
+                onNext = {
+                    viewModel.nextCard()
+                },
+                onPrevious = {
+                    viewModel.previousCard()
+                },
                 onFinish = {
                     navController.popBackStack()
                 },
-                onToggleKnown = { viewModel.toggleKnown() },
-                onBack = { navController.popBackStack() }
+                onToggleKnown = {
+                    viewModel.toggleKnown()
+                },
+                onBack = {
+                    navController.popBackStack()
+                }
             )
         }
 
@@ -198,7 +278,6 @@ fun AppNavGraph(
                 }
             }
 
-
             LearnScreen(
                 state = learnState,
                 onAnswerSelected = { answer ->
@@ -214,8 +293,8 @@ fun AppNavGraph(
                     navController.popBackStack()
                 }
             )
-
         }
+
         composable("settings") {
             SettingsScreen(
                 isDarkTheme = isDarkTheme,
@@ -226,5 +305,28 @@ fun AppNavGraph(
             )
         }
 
+        composable(Screen.Import.route) {
+            ImportScreen(
+                state = importState,
+                selectedCategory = selectedCategory,
+                onCategorySelected = {
+                    importViewModel.selectCategory(it)
+                },
+                onLoad = {
+                    importViewModel.load()
+                },
+                onSave = { cards ->
+                    viewModel.importDeck(
+                        "Trivia: ${selectedCategory.title}",
+                        cards
+                    )
+                    importViewModel.reset()
+                    navController.popBackStack()
+                },
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
     }
 }

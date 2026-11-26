@@ -1,8 +1,10 @@
 package com.example.flashquiz.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -12,6 +14,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -27,9 +31,6 @@ import com.example.flashquiz.data.model.Deck
 import com.example.flashquiz.data.model.Flashcard
 import com.example.flashquiz.ui.components.DeckCard
 import com.example.flashquiz.ui.theme.FlashQuizTheme
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.material3.MaterialTheme
 
 @Composable
 fun DeckListScreen(
@@ -39,7 +40,8 @@ fun DeckListScreen(
     modifier: Modifier = Modifier,
     onUpdateDeck: (Int, String) -> Unit,
     onDeleteDeck: (Int) -> Unit,
-    onSettingsClick: () -> Unit = {}
+    onSettingsClick: () -> Unit = {},
+    onImport: () -> Unit = {}
 ) {
     var showDialog by rememberSaveable { mutableStateOf(false) }
     var newName by rememberSaveable { mutableStateOf("") }
@@ -63,6 +65,7 @@ fun DeckListScreen(
                 Text("Settings")
             }
         }
+
         LazyColumn(
             modifier = Modifier.weight(1f),
             contentPadding = PaddingValues(vertical = 8.dp)
@@ -103,16 +106,31 @@ fun DeckListScreen(
                 }
             }
         }
-        Button(
-            onClick = { showDialog = true },
+
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .navigationBarsPadding()
-                .padding(16.dp)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text("Add deck")
+            Button(
+                onClick = { showDialog = true },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Add deck")
+            }
+
+            OutlinedButton(
+                onClick = onImport,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Import from internet")
+            }
         }
     }
+
+    // Add deck dialog
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
@@ -133,10 +151,16 @@ fun DeckListScreen(
                         showDialog = false
                     },
                     enabled = newName.isNotBlank()
-                ) { Text("Create") }
+                ) {
+                    Text("Create")
+                }
             },
             dismissButton = {
-                TextButton(onClick = { showDialog = false }) { Text("Cancel") }
+                TextButton(
+                    onClick = { showDialog = false }
+                ) {
+                    Text("Cancel")
+                }
             }
         )
     }
@@ -163,10 +187,14 @@ fun DeckListScreen(
                         editingDeckId = null
                     },
                     enabled = editedName.isNotBlank()
-                ) { Text("Save") }
+                ) {
+                    Text("Save")
+                }
             },
             dismissButton = {
-                TextButton(onClick = { editingDeckId = null }) {
+                TextButton(
+                    onClick = { editingDeckId = null }
+                ) {
                     Text("Cancel")
                 }
             }
@@ -189,10 +217,14 @@ fun DeckListScreen(
                         }
                         deletingDeckId = null
                     }
-                ) { Text("Delete") }
+                ) {
+                    Text("Delete")
+                }
             },
             dismissButton = {
-                TextButton(onClick = { deletingDeckId = null }) {
+                TextButton(
+                    onClick = { deletingDeckId = null }
+                ) {
                     Text("Cancel")
                 }
             }
@@ -208,15 +240,27 @@ fun DeckListScreenPreview() {
             id = 1,
             name = "Kotlin Basics",
             cards = listOf(
-                Flashcard(id = 1, question = "Read-only variable?", answer = "val"),
-                Flashcard(id = 2, question = "Mutable variable?", answer = "var")
+                Flashcard(
+                    id = 1,
+                    question = "Read-only variable?",
+                    answer = "val"
+                ),
+                Flashcard(
+                    id = 2,
+                    question = "Mutable variable?",
+                    answer = "var"
+                )
             )
         ),
         Deck(
             id = 2,
             name = "Jetpack Compose",
             cards = listOf(
-                Flashcard(id = 3, question = "List component?", answer = "LazyColumn")
+                Flashcard(
+                    id = 3,
+                    question = "List component?",
+                    answer = "LazyColumn"
+                )
             )
         ),
         Deck(
@@ -231,8 +275,10 @@ fun DeckListScreenPreview() {
             decks = sampleDecks,
             onDeckClick = {},
             onAddDeck = {},
-            onUpdateDeck =  { _, _ -> },
-            onDeleteDeck = {}
+            onUpdateDeck = { _, _ -> },
+            onDeleteDeck = {},
+            onSettingsClick = {},
+            onImport = {}
         )
     }
 }

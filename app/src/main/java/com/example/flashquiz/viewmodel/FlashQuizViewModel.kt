@@ -348,4 +348,20 @@ class FlashQuizViewModel(
             state.copy(cards = state.cards.shuffled(), currentIndex = 0, isFlipped = false)
         }
     }
+    fun importDeck(name: String, cards: List<Flashcard>) {
+        if (name.isBlank() || cards.isEmpty()) return
+
+        viewModelScope.launch {
+            val deckId = repository.addDeck(name.trim()).toInt()
+
+            cards.forEach { card ->
+                repository.addCard(
+                    deckId = deckId,
+                    question = card.question,
+                    answer = card.answer,
+                    wrongAnswers = card.wrongAnswers
+                )
+            }
+        }
+    }
 }
