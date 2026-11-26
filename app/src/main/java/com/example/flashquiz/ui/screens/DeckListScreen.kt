@@ -1,5 +1,6 @@
 package com.example.flashquiz.ui.screens
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -32,6 +34,7 @@ fun DeckListScreen(
     decks: List<Deck>,
     onDeckClick: (Int) -> Unit,
     onAddDeck: (String) -> Unit,
+    onImport: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var showDialog by rememberSaveable { mutableStateOf(false) }
@@ -39,8 +42,8 @@ fun DeckListScreen(
 
     Column(
         modifier = modifier
-        .fillMaxSize()
-        .statusBarsPadding()
+            .fillMaxSize()
+            .statusBarsPadding()
     ) {
         LazyColumn(
             modifier = Modifier.weight(1f),
@@ -57,14 +60,25 @@ fun DeckListScreen(
                 )
             }
         }
-        Button(
-            onClick = { showDialog = true },
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .navigationBarsPadding()
-                .padding(16.dp)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text("Add deck")
+            Button(
+                onClick = { showDialog = true },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Add deck")
+            }
+            OutlinedButton(
+                onClick = onImport,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Import from internet")
+            }
         }
     }
     if (showDialog) {
