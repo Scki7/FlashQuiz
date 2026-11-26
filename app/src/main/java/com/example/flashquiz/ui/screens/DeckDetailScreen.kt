@@ -1,5 +1,6 @@
 package com.example.flashquiz.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -53,6 +54,7 @@ fun DeckDetailScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
             .navigationBarsPadding()
             .padding(horizontal = 16.dp, vertical = 12.dp)
@@ -87,7 +89,8 @@ fun DeckDetailScreen(
         Text(
             text = deck.name,
             style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground
         )
 
         Text(
@@ -102,7 +105,8 @@ fun DeckDetailScreen(
         Text(
             text = "Cards",
             style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onBackground
         )
 
         Spacer(Modifier.height(12.dp))
@@ -144,12 +148,14 @@ fun DeckDetailScreen(
 
                             Text(
                                 text = card.question,
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
 
                             Icon(
                                 Icons.Default.ChevronRight,
-                                contentDescription = null
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
 
@@ -201,7 +207,8 @@ fun DeckDetailScreen(
         Text(
             text = "Study modes",
             style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onBackground
         )
 
         Spacer(Modifier.height(12.dp))
@@ -360,13 +367,16 @@ private fun StudyModeButton(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            icon()
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+                icon()
+            }
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = description,
@@ -377,7 +387,8 @@ private fun StudyModeButton(
 
             Icon(
                 Icons.Default.ChevronRight,
-                contentDescription = null
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
     }

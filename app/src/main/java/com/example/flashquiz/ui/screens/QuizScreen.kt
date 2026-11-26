@@ -1,5 +1,6 @@
 package com.example.flashquiz.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,6 +26,8 @@ import androidx.compose.ui.unit.dp
 import com.example.flashquiz.data.model.Flashcard
 import com.example.flashquiz.data.model.QuizUiState
 import com.example.flashquiz.ui.theme.Correct
+import com.example.flashquiz.ui.theme.CorrectTextDark
+import com.example.flashquiz.ui.theme.BackgroundDark
 import com.example.flashquiz.ui.theme.FlashQuizTheme
 
 @Composable
@@ -35,11 +38,17 @@ fun QuizScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var answer by rememberSaveable(state.currentIndex) { mutableStateOf("") }
+    var answer by rememberSaveable(state.currentIndex) {
+        mutableStateOf("")
+    }
+
+    val isDarkTheme =
+        MaterialTheme.colorScheme.background == BackgroundDark
 
     Column(
         modifier = modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -47,37 +56,66 @@ fun QuizScreen(
         IconButton(onClick = onBack) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back"
+                contentDescription = "Back",
+                tint = MaterialTheme.colorScheme.onBackground
             )
         }
 
         Text(
             "Question ${state.currentIndex + 1} / ${state.total}",
-            style = MaterialTheme.typography.labelLarge
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onBackground
         )
-        Text("Score: ${state.score}", style = MaterialTheme.typography.bodyMedium)
+
+        Text(
+            "Score: ${state.score}",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+
         Text(
             state.currentCard?.question ?: "",
-            style = MaterialTheme.typography.headlineSmall
+            style = MaterialTheme.typography.headlineSmall,
+            color = MaterialTheme.colorScheme.onBackground
         )
+
         OutlinedTextField(
             value = answer,
             onValueChange = { answer = it },
             label = { Text("Your answer") },
             modifier = Modifier.fillMaxWidth()
         )
+
         Button(
             onClick = { onSubmit(answer) },
-            enabled = answer.isNotBlank() && state.lastAnswerCorrect == null,
+            enabled = answer.isNotBlank() &&
+                    state.lastAnswerCorrect == null,
             modifier = Modifier.fillMaxWidth()
-        ) { Text("Check") }
+        ) {
+            Text("Check")
+        }
+
         state.lastAnswerCorrect?.let { correct ->
             Text(
-                text = if (correct) "Correct!" else "Wrong. Answer: ${state.currentCard?.answer}",
-                color = if (correct) Correct else MaterialTheme.colorScheme.error,
+                text = if (correct) {
+                    "Correct!"
+                } else {
+                    "Wrong. Answer: ${state.currentCard?.answer}"
+                },
+                color = if (correct) {
+                    if (isDarkTheme) CorrectTextDark else Correct
+                } else {
+                    MaterialTheme.colorScheme.error
+                },
                 style = MaterialTheme.typography.titleMedium
             )
-            Button(onClick = onNext, modifier = Modifier.fillMaxWidth()) { Text("Next") }
+
+            Button(
+                onClick = onNext,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Next")
+            }
         }
     }
 }
@@ -89,8 +127,16 @@ fun QuizScreenPreview() {
         QuizScreen(
             state = QuizUiState(
                 cards = listOf(
-                    Flashcard(1, "Keyword for a read-only variable?", "val"),
-                    Flashcard(2, "Keyword for a mutable variable?", "var")
+                    Flashcard(
+                        1,
+                        "Keyword for a read-only variable?",
+                        "val"
+                    ),
+                    Flashcard(
+                        2,
+                        "Keyword for a mutable variable?",
+                        "var"
+                    )
                 )
             ),
             onSubmit = {},

@@ -1,5 +1,6 @@
 package com.example.flashquiz.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,6 +29,7 @@ import com.example.flashquiz.ui.components.DeckCard
 import com.example.flashquiz.ui.theme.FlashQuizTheme
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.material3.MaterialTheme
 
 @Composable
 fun DeckListScreen(
@@ -36,7 +38,8 @@ fun DeckListScreen(
     onAddDeck: (String) -> Unit,
     modifier: Modifier = Modifier,
     onUpdateDeck: (Int, String) -> Unit,
-    onDeleteDeck: (Int) -> Unit
+    onDeleteDeck: (Int) -> Unit,
+    onSettingsClick: () -> Unit = {}
 ) {
     var showDialog by rememberSaveable { mutableStateOf(false) }
     var newName by rememberSaveable { mutableStateOf("") }
@@ -49,8 +52,17 @@ fun DeckListScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
     ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            TextButton(onClick = onSettingsClick) {
+                Text("Settings")
+            }
+        }
         LazyColumn(
             modifier = Modifier.weight(1f),
             contentPadding = PaddingValues(vertical = 8.dp)

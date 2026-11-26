@@ -1,5 +1,6 @@
 package com.example.flashquiz.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,29 +25,52 @@ fun ResultScreen(
     onTryAgain: () -> Unit,
     onBackToDecks: () -> Unit,
     modifier: Modifier = Modifier
-){
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
             .padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
+        verticalArrangement = Arrangement.spacedBy(
+            12.dp,
+            Alignment.CenterVertically
+        ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Quiz finished", style = MaterialTheme.typography.headlineMedium)
+        Text(
+            text = "Quiz finished",
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+
         Text(
             "$score / $total",
             style = MaterialTheme.typography.displayMedium,
             color = MaterialTheme.colorScheme.primary
         )
+
         Text(
-            if (total > 0 && score * 2 >= total) "Great job!" else "Keep practicing",
-            style = MaterialTheme.typography.titleMedium
+            text = if (total > 0 && score * 2 >= total) {
+                "Great job!"
+            } else {
+                "Keep practicing"
+            },
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onBackground
         )
-        Button(onClick = onTryAgain, modifier = Modifier.fillMaxWidth()) {
+
+        Button(
+            onClick = onTryAgain,
+            modifier = Modifier.fillMaxWidth()
+        ) {
             Text("Try again")
         }
-        OutlinedButton(onClick = onBackToDecks, modifier = Modifier.fillMaxWidth()) {
+
+        OutlinedButton(
+            onClick = onBackToDecks,
+            modifier = Modifier.fillMaxWidth()
+        ) {
             Text("Back to decks")
         }
     }
@@ -55,5 +79,12 @@ fun ResultScreen(
 @Preview(showBackground = true)
 @Composable
 fun ResultScreenPreview() {
-    FlashQuizTheme { ResultScreen(score = 2, total = 3, onTryAgain = {}, onBackToDecks = {})}
+    FlashQuizTheme {
+        ResultScreen(
+            score = 2,
+            total = 3,
+            onTryAgain = {},
+            onBackToDecks = {}
+        )
+    }
 }

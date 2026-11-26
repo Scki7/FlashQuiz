@@ -3,6 +3,7 @@ package com.example.flashquiz.ui.screens
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -46,6 +47,7 @@ fun FlashcardScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
             .navigationBarsPadding()
             .padding(16.dp),
@@ -56,7 +58,8 @@ fun FlashcardScreen(
         IconButton(onClick = onBack) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back"
+                contentDescription = "Back",
+                tint = MaterialTheme.colorScheme.onBackground
             )
         }
 
@@ -64,7 +67,8 @@ fun FlashcardScreen(
         Text(
             text = "Flashcards",
             style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground
         )
 
         // Card progress information
@@ -74,7 +78,8 @@ fun FlashcardScreen(
         ) {
             Text(
                 text = "Card ${state.currentIndex + 1} of ${state.total}",
-                style = MaterialTheme.typography.labelLarge
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onBackground
             )
 
             Text(
@@ -93,7 +98,9 @@ fun FlashcardScreen(
                     0f
                 }
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.primary,
+            trackColor = MaterialTheme.colorScheme.surfaceVariant
         )
 
         // Flashcard
@@ -118,7 +125,8 @@ fun FlashcardScreen(
                     defaultElevation = 4.dp
                 ),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             ) {
 
@@ -155,7 +163,8 @@ fun FlashcardScreen(
                             },
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Medium,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
 
                         Text(
@@ -181,11 +190,13 @@ fun FlashcardScreen(
             OutlinedButton(
                 onClick = onPrevious,
                 enabled = !state.isFirst,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = MaterialTheme.colorScheme.primary
+                )
             ) {
                 Text("Previous")
             }
-
 
             Button(
                 onClick = {
@@ -196,7 +207,11 @@ fun FlashcardScreen(
                     }
                 },
                 enabled = state.currentCard != null,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
             ) {
                 Text(
                     if (state.isLast) "Finish" else "Next"
@@ -204,12 +219,16 @@ fun FlashcardScreen(
             }
 
         }
+
         // Known status button
         OutlinedButton(
             onClick = onToggleKnown,
             enabled = state.currentCard != null,
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(14.dp)
+            shape = RoundedCornerShape(14.dp),
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = MaterialTheme.colorScheme.primary
+            )
         ) {
             Text(
                 text = if (state.isCurrentKnown) {

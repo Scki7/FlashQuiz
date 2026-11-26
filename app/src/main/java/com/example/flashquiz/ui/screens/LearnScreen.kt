@@ -1,6 +1,8 @@
 package com.example.flashquiz.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -14,6 +16,10 @@ import androidx.compose.ui.unit.dp
 import com.example.flashquiz.data.model.Flashcard
 import com.example.flashquiz.data.model.LearnUiState
 import com.example.flashquiz.ui.theme.CorrectBackground
+import com.example.flashquiz.ui.theme.CorrectBackgroundDark
+import com.example.flashquiz.ui.theme.CorrectTextDark
+import com.example.flashquiz.ui.theme.IncorrectBackgroundDark
+import com.example.flashquiz.ui.theme.IncorrectTextDark
 import com.example.flashquiz.ui.theme.CorrectText
 import com.example.flashquiz.ui.theme.FlashQuizTheme
 import com.example.flashquiz.ui.theme.IncorrectBackground
@@ -28,9 +34,16 @@ fun LearnScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
+    val correctBackground = if (isDark) CorrectBackgroundDark else CorrectBackground
+    val correctText = if (isDark) CorrectTextDark else CorrectText
+    val incorrectBackground = if (isDark) IncorrectBackgroundDark else IncorrectBackground
+    val incorrectText = if (isDark) IncorrectTextDark else IncorrectText
+
     Column(
         modifier = modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
             .navigationBarsPadding()
             .padding(16.dp),
@@ -41,14 +54,16 @@ fun LearnScreen(
         IconButton(onClick = onBack) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back"
+                contentDescription = "Back",
+                tint = MaterialTheme.colorScheme.onBackground
             )
         }
 
         // Header
         Text(
             text = "Learn",
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onBackground
         )
 
         Text(
@@ -66,7 +81,8 @@ fun LearnScreen(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             ) {
                 Column(
@@ -109,7 +125,7 @@ fun LearnScreen(
                         Text("Correct answers")
                         Text(
                             text = "${state.correctAnswers}",
-                            color = CorrectText,
+                            color = correctText,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -121,7 +137,7 @@ fun LearnScreen(
                         Text("Wrong attempts")
                         Text(
                             text = "${state.wrongAnswers}",
-                            color = IncorrectText,
+                            color = incorrectText,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -176,7 +192,8 @@ fun LearnScreen(
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
                         containerColor =
-                            MaterialTheme.colorScheme.surfaceVariant
+                            MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 ) {
                     Text(
@@ -189,7 +206,8 @@ fun LearnScreen(
 
                 Text(
                     text = "Choose the correct answer",
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onBackground
                 )
 
                 // Answer options
@@ -208,10 +226,10 @@ fun LearnScreen(
                     // Background color
                     val backgroundColor = when {
                         isAnswered && isCorrectOption ->
-                            CorrectBackground
+                            correctBackground
 
                         isAnswered && isSelectedOption ->
-                            IncorrectBackground
+                            incorrectBackground
 
                         else ->
                             MaterialTheme.colorScheme.surface
@@ -220,10 +238,10 @@ fun LearnScreen(
                     // Text color
                     val textColor = when {
                         isAnswered && isCorrectOption ->
-                            CorrectText
+                            correctText
 
                         isAnswered && isSelectedOption ->
-                            IncorrectText
+                            incorrectText
 
                         else ->
                             MaterialTheme.colorScheme.onSurface
