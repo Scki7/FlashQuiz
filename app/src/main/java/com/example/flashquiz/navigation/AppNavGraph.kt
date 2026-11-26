@@ -15,20 +15,26 @@ import com.example.flashquiz.ui.screens.AddCardScreen
 import com.example.flashquiz.ui.screens.DeckDetailScreen
 import com.example.flashquiz.ui.screens.DeckListScreen
 import com.example.flashquiz.ui.screens.FlashcardScreen
+import com.example.flashquiz.ui.screens.ImportScreen
+import com.example.flashquiz.ui.screens.LearnScreen
 import com.example.flashquiz.ui.screens.QuizScreen
 import com.example.flashquiz.ui.screens.ResultScreen
 import com.example.flashquiz.viewmodel.FlashQuizViewModel
-import com.example.flashquiz.ui.screens.LearnScreen
+import com.example.flashquiz.viewmodel.ImportViewModel
 
 @Composable
 fun AppNavGraph(
     navController: NavHostController = rememberNavController(),
-    viewModel: FlashQuizViewModel = viewModel()
+    viewModel: FlashQuizViewModel = viewModel(),
+    importViewModel: ImportViewModel = viewModel()
 ) {
     val decks by viewModel.decks.collectAsState()
     val quizState by viewModel.quizState.collectAsState()
     val flashcardState by viewModel.flashcardState.collectAsState()
     val learnState by viewModel.learnState.collectAsState()
+    val importState by importViewModel.uiState.collectAsState()
+    val selectedCategory by importViewModel.selectedCategory.collectAsState()
+
     NavHost(
         navController = navController,
         startDestination = Screen.DeckList.route
@@ -40,7 +46,8 @@ fun AppNavGraph(
                 onDeckClick = { id ->
                     navController.navigate(Screen.DeckDetail.createRoute(id))
                 },
-                onAddDeck = { name -> viewModel.addDeck(name) }
+                onAddDeck = { name -> viewModel.addDeck(name) },
+                onImport = { navController.navigate(Screen.Import.route) }
             )
         }
 
@@ -175,7 +182,6 @@ fun AppNavGraph(
                 }
             }
 
-
             LearnScreen(
                 state = learnState,
                 onAnswerSelected = { answer ->
@@ -191,8 +197,21 @@ fun AppNavGraph(
                     navController.popBackStack()
                 }
             )
-
         }
 
+        composable(Screen.Import.route) {
+            ImportScreen(
+                state = importState,
+                selectedCategory = selectedCategory,
+                onCategorySelected = { importViewModel.selectCategory(it) },
+                onLoad = { importViewModel.load() },
+                onSave = { cards ->
+                    viewModel.importDeck("Trivia: ${selectedCategory.title}", cards)
+                    importViewModel.reset()
+                    navController.popBackStack()
+                },
+                onBack = { navController.popBackStack() }
+            )
+        }
     }
 }

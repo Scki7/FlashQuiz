@@ -244,6 +244,13 @@ class FlashQuizViewModel : ViewModel() {
             state.copy(cards = state.cards.shuffled(), currentIndex = 0, isFlipped = false)
         }
     }
+
+    fun importDeck(name: String, cards: List<Flashcard>) {
+        if (name.isBlank() || cards.isEmpty()) return
+        val deckId = nextDeckId++
+        val newCards = cards.map { it.copy(id = nextCardId++) }
+        _decks.update { it + Deck(id = deckId, name = name.trim(), cards = newCards) }
+    }
     private fun sampleDecks() = listOf(
         Deck(
             id = 1, name = "Kotlin basics",
