@@ -19,11 +19,13 @@ import com.example.flashquiz.ui.screens.QuizScreen
 import com.example.flashquiz.ui.screens.ResultScreen
 import com.example.flashquiz.viewmodel.FlashQuizViewModel
 import com.example.flashquiz.ui.screens.LearnScreen
-
+import com.example.flashquiz.ui.screens.SettingsScreen
 @Composable
 fun AppNavGraph(
     navController: NavHostController = rememberNavController(),
-    viewModel: FlashQuizViewModel = viewModel()
+    viewModel: FlashQuizViewModel = viewModel(),
+    isDarkTheme: Boolean = false,
+    onThemeChange: (Boolean) -> Unit = {}
 ) {
     val decks by viewModel.decks.collectAsState()
     val quizState by viewModel.quizState.collectAsState()
@@ -46,6 +48,9 @@ fun AppNavGraph(
                 },
                 onDeleteDeck = { deckId ->
                     viewModel.deleteDeck(deckId)
+                },
+                onSettingsClick = {
+                    navController.navigate("settings")
                 }
             )
         }
@@ -210,6 +215,15 @@ fun AppNavGraph(
                 }
             )
 
+        }
+        composable("settings") {
+            SettingsScreen(
+                isDarkTheme = isDarkTheme,
+                onThemeChange = onThemeChange,
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
         }
 
     }
